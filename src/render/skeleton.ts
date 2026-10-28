@@ -215,7 +215,7 @@ export function drawSkeleton(
   ctx.save();
   ctx.translate(sx, sy);
   ctx.scale(facing * S, -S); // y-up local space
-  ctx.globalAlpha = opts.alpha ?? 1;
+  ctx.globalAlpha *= opts.alpha ?? 1;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   const outline = recolor(pal.outline);

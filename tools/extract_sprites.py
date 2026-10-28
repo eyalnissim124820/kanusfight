@@ -7,7 +7,12 @@ Turn an AI-generated green-screen pose sheet into a game sprite atlas.
 
 layout.json describes where each animation sits on the source sheet:
   bands     – [y0, y1] pixel rows of each strip of frames (below the black label bars)
-  anims     – [name, bandIndex, [x0, x1], frameCount, {options}]   options: keepFirst (drop detached effects)
+  anims     – [name, bandIndex, [x0, x1], frameCount, {options}]
+              options: keepFirst N   – keep only the first N blobs (drop detached effects)
+                       stripWhite    – remove white/light-grey pixels first (e.g. an opponent in a white outfit)
+                       maxReach px   – per-animation reach crop (overrides the global one)
+                       anchor 'center' – anchor on the bounding-box centre (projectiles)
+  thinLines – true: erase 1–2px lines (cell borders) before finding frames
   centerAnchor – animations anchored on their bounding-box centre (airborne / lying poses)
   maxReach  – crop effects that reach further forward than this (source px)
   scale     – resample factor for the output (1.5 = sharper when drawn at game size)
@@ -41,6 +46,12 @@ def frames_for(anim, band, sec, n, opts=None):
     fg = ~green[y0:y1, x0:x1]
     fg[:, dark[y0:y1, x0:x1].mean(0) > 0.85] = False  # vertical separators
     fg[dark[y0:y1, x0:x1].mean(1) > 0.5, :] = False  # label-bar rows
+    if opts.get('stripWhite'):
+        px = im[y0:y1, x0:x1]
+        white = (px.min(2) > 135) & (px.max(2) - px.min(2) < 45)
+        fg &= ~ndimage.binary_dilation(white, iterations=2)
+    if cfg.get('thinLines'):
+        fg = ndimage.binary_opening(fg, structure=np.ones((3, 3)))
     lab, cnt = ndimage.label(fg)
     objs = ndimage.find_objects(lab)
     areas = ndimage.sum(fg, lab, range(1, cnt + 1))
@@ -54,6 +65,7 @@ def frames_for(anim, band, sec, n, opts=None):
     masks = [lab == c['id'] for c in big]
     if 'keepFirst' in opts:
         masks = masks[:opts['keepFirst']]
+        big = big[:opts['keepFirst']]
     if len(masks) < n:  # touching frames: split the widest blob at its emptiest column
         while len(masks) < n:
             wi = max(range(len(masks)), key=lambda i: np.ptp(np.nonzero(masks[i].any(0))[0]))
@@ -117,11 +129,15 @@ def frames_for(anim, band, sec, n, opts=None):
         m = ndimage.binary_dilation(m, iterations=1) & ~(dark[y0:y1, x0:x1] & (lab == 0))
         ys, xs = np.nonzero(m)
         fy0, fy1, fx0, fx1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-        if anim in CENTER:
+        if opts.get('anchor') == 'center':
+            ax, fy1c = (fx0 + fx1) / 2, (fy0 + fy1) / 2
+        elif anim in CENTER:
             ax = (fx0 + fx1) / 2
         else:  # the densest column is the trunk: a stable anchor while limbs move
             ax = float(np.argmax(np.convolve(m.sum(0).astype(float), np.ones(15) / 15, 'same')))
-        res.append({'anim': anim, 'i': i, 'mask': m, 'box': (fx0, fy0, fx1, fy1), 'ax': ax, 'ay': fy1, 'ox': x0, 'oy': y0})
+        ay = fy1c if opts.get('anchor') == 'center' else fy1
+        res.append({'anim': anim, 'i': i, 'mask': m, 'box': (fx0, fy0, fx1, fy1), 'ax': ax, 'ay': ay, 'ox': x0, 'oy': y0,
+                    'reach': opts.get('maxReach', MAX_REACH)})
     return res
 
 
@@ -144,8 +160,8 @@ cells = []
 for f in frames:
     sp = rgba(f)
     ax, ay = f['ax'] - f['box'][0], f['ay'] - f['box'][1]
-    if sp.width - ax > MAX_REACH:
-        sp = sp.crop((0, 0, int(ax + MAX_REACH), sp.height))
+    if sp.width - ax > f['reach']:
+        sp = sp.crop((0, 0, int(ax + f['reach']), sp.height))
     sp = sp.resize((round(sp.width * SCALE), round(sp.height * SCALE)), Image.LANCZOS)
     cells.append((f, sp, ax * SCALE, ay * SCALE))
 

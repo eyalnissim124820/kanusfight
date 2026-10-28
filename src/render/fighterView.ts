@@ -162,7 +162,7 @@ export function blitFrame(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
   const [x, y, w, h, ax, ay] = fr;
   const s = (height / sp.standHeight) * (sp.scale ?? 1);
   ctx.save();
-  ctx.globalAlpha = opts.alpha ?? 1;
+  ctx.globalAlpha *= opts.alpha ?? 1;
   ctx.filter = spriteFilter(opts);
   ctx.translate(sx, sy);
   ctx.scale(facing * s, s);
@@ -173,6 +173,54 @@ export function blitFrame(ctx: CanvasRenderingContext2D, img: HTMLImageElement, 
 /** Draw a fighter at screen position (sx, sy) where sy is the ground line. */
 export function drawFighter(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, sy: number, frame: number) {
   if (f.hidden) return;
+  if (f.slice > 0) { drawSliced(ctx, f, sx, sy, frame); return; }
+  drawFighterBody(ctx, f, sx, sy, frame);
+}
+
+/** 'slice' finisher: draw the fighter twice, clipped on each side of a diagonal cut, sliding apart. */
+function drawSliced(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, sy: number, frame: number) {
+  const k = f.slice, a = (25 * Math.PI) / 180, L = 600;
+  const back = -f.facing; // the top half slides away from the attacker
+  const d = { x: Math.cos(a) * back, y: -Math.sin(a) }; // along the cut, rising backwards
+  const cx = sx, cy = sy - f.y - f.height * 0.52;
+  const fade = 1 - Math.max(0, (k - 0.65) / 0.35);
+  const half = (side: 1 | -1, ox: number, oy: number) => {
+    // normal pointing to the kept side: up for the top half (side 1), down for the bottom half
+    const p = { x: -d.y, y: d.x }, up = p.y < 0 ? 1 : -1;
+    const n = { x: p.x * up * side, y: p.y * up * side };
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.beginPath();
+    ctx.moveTo(cx - d.x * L, cy - d.y * L);
+    ctx.lineTo(cx + d.x * L, cy + d.y * L);
+    ctx.lineTo(cx + d.x * L + n.x * L, cy + d.y * L + n.y * L);
+    ctx.lineTo(cx - d.x * L + n.x * L, cy - d.y * L + n.y * L);
+    ctx.closePath();
+    ctx.clip();
+    ctx.translate(ox, oy);
+    drawFighterBody(ctx, f, sx, sy, frame);
+    ctx.restore();
+  };
+  const slide = 110 * (1 - (1 - k) * (1 - k));
+  const drop = 260 * Math.max(0, k - 0.4) ** 2;
+  half(-1, 0, 0);
+  half(1, d.x * slide, d.y * slide + drop);
+  if (k < 0.35) { // glowing cut line
+    ctx.save();
+    ctx.globalAlpha = 1 - k / 0.35;
+    ctx.strokeStyle = f.opponent.def.finisher.color;
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(cx - d.x * 90, cy - d.y * 90);
+    ctx.lineTo(cx + d.x * 90, cy + d.y * 90);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawFighterBody(ctx: CanvasRenderingContext2D, f: Fighter, sx: number, sy: number, frame: number) {
   const opts: DrawOpts = {
     alpha: fighterAlpha(f),
     flash: f.flash > 0 ? 0.6 : 0,

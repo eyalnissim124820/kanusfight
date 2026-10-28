@@ -48,6 +48,7 @@ Directions are relative to facing (→ = toward the opponent).
 |---|---|---|
 | **KANU** (heavy) | Thunder Orb ← → LP · Bull Charge → → HP · Quake Stomp ↓ ← HK | Shatter Fist → ↓ → HP (close) |
 | **TALDAN** (heavy, sprite art) | Power Blast ← → LP · Riot Rush → → HP | Final Verdict → ↓ → HP (any range) |
+| **BEN** (quick, sprite art) | Flying Shears ← → LP · Denim Lance ← → HK | Perfect Cut → ↓ → LK (close) |
 | **NYX** (fast) | Moon Blade ← → HP · Shadow Step ↓ ← LP · Crescent Rise ↓ → HK · Talon Dive (air) ↓ HK | Eclipse → ← → LK (any range) |
 
 The finisher works in the deciding round: when the loser is stunned and **END IT!** appears.
@@ -66,7 +67,7 @@ A `CharacterDef` contains:
 - `specials`: `{ motion: ['D','F'], button: 'HK', move: {...} }`. A move can spawn a `projectile`, dash
   (`selfVel`), rise or dive (`selfVel.y` + `untilLand`), `teleport`, `spin`, be `invuln` for some frames, and more.
   `role` tells the CPU how to use it.
-- `finisher`: motion, button, range (`close`/`far`/`any`), effect (`shatter`/`vaporize`), color and pose
+- `finisher`: motion, button, range (`close`/`far`/`any`), effect (`shatter`/`vaporize`/`slice`), color and pose
 - `poses`: optional overrides of the base poses (idle, victory, …)
 
 Frame data is in 60 fps frames: `startup → active → recovery`. Hitboxes are `{x, y, w, h}` in local space
@@ -87,7 +88,13 @@ Press **F1** in a fight to see them.
    python3 tools/extract_sprites.py art/<name>/layout.json
    ```
    It writes `public/sprites/<name>.webp` (the image) and `src/characters/sprites/<name>.json` (frame rectangles + anchors).
-4. **Character file.** Copy `src/characters/taldan.ts`, import the new atlas JSON, and add the character to `ROSTER`.
+   If the art comes as **one image per frame** instead (like Ben's pack in `art/ben/sprites/<anim>/<anim>_NN.png`),
+   skip steps 1–3 and pack the folder directly. Every frame must share the same canvas placement; `--pivot` is
+   the floor point under the fighter:
+   ```bash
+   python3 tools/pack_frames.py art/ben/sprites public/sprites/ben.webp src/characters/sprites/ben.json --scale 0.36 --pivot 512,996
+   ```
+4. **Character file.** Copy `src/characters/taldan.ts` (or `ben.ts`), import the new atlas JSON, and add the character to `ROSTER`.
 
 The `sprites` block in a character file:
 

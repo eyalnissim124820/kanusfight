@@ -1,0 +1,458 @@
+{
+  "title": "BEN — The Cocky Barber",
+  "version": "1.0 (concept prototype)",
+  "canvas": {
+    "width": 1024,
+    "height": 1024,
+    "background": "#00FF00"
+  },
+  "view": "2D side-view, facing right (approximate in AI source frames)",
+  "style": "1990s hand-painted arcade fighter",
+  "character": {
+    "name": "Ben",
+    "height_cm": 188,
+    "weight_kg": 77,
+    "appearance": "Tall, lean, naturally fit, shirtless and clean-chested; light-brown wavy hair, moustache and short stubble, silver hoop earrings and chain",
+    "costume": "Brown leather barber apron, baggy navy blue streetwear jeans, black-and-white retro sneakers",
+    "equipment": "Professional metal barber scissors",
+    "personality": "Cocky, expressive, smirking",
+    "special": "Denim Lance: trousers elastically extend and stiffen into a fabric-covered striking lance; nothing emerges from inside the pants",
+    "finisher": "Perfect Cut: charged barber scissors"
+  },
+  "animations": {
+    "idle": {
+      "frame_count": 4,
+      "fps_suggestion": 9,
+      "frames": [
+        {
+          "file": "sprites/idle/idle_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/idle/idle_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/idle/idle_03.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/idle/idle_04.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "walk": {
+      "frame_count": 6,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/walk/walk_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/walk/walk_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/walk/walk_03.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/walk/walk_04.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/walk/walk_05.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/walk/walk_06.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "crouch": {
+      "frame_count": 1,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/crouch/crouch_01.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "jump": {
+      "frame_count": 4,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/jump/jump_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/jump/jump_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/jump/jump_03.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/jump/jump_04.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "block": {
+      "frame_count": 1,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/block/block_01.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "crouchBlock": {
+      "frame_count": 1,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/crouchBlock/crouchBlock_01.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "lp": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/lp/lp_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/lp/lp_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/lp/lp_03.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "hp": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/hp/hp_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/hp/hp_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/hp/hp_03.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "lk": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/lk/lk_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/lk/lk_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/lk/lk_03.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "hk": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/hk/hk_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/hk/hk_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/hk/hk_03.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "sweep": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/sweep/sweep_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/sweep/sweep_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/sweep/sweep_03.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "roundhouse": {
+      "frame_count": 4,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/roundhouse/roundhouse_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/roundhouse/roundhouse_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/roundhouse/roundhouse_03.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/roundhouse/roundhouse_04.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "uppercut": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/uppercut/uppercut_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/uppercut/uppercut_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/uppercut/uppercut_03.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "crouchLk": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/crouchLk/crouchLk_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/crouchLk/crouchLk_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "jumpKick": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/jumpKick/jumpKick_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/jumpKick/jumpKick_02.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "jumpPunch": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/jumpPunch/jumpPunch_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/jumpPunch/jumpPunch_02.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "throw": {
+      "frame_count": 4,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/throw/throw_01.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/throw/throw_02.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/throw/throw_03.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/throw/throw_04.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "hitHigh": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/hitHigh/hitHigh_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/hitHigh/hitHigh_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "hitLow": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/hitLow/hitLow_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/hitLow/hitLow_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "airHit": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/airHit/airHit_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/airHit/airHit_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "lying": {
+      "frame_count": 1,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/lying/lying_01.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "getup": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/getup/getup_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/getup/getup_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "dizzy": {
+      "frame_count": 3,
+      "fps_suggestion": 9,
+      "frames": [
+        {
+          "file": "sprites/dizzy/dizzy_01.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/dizzy/dizzy_02.png",
+          "art_source": "source-atlas"
+        },
+        {
+          "file": "sprites/dizzy/dizzy_03.png",
+          "art_source": "source-atlas"
+        }
+      ]
+    },
+    "victory": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/victory/victory_01.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/victory/victory_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "denimLance": {
+      "frame_count": 3,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/denimLance/denimLance_01.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/denimLance/denimLance_02.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/denimLance/denimLance_03.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    },
+    "finisher": {
+      "frame_count": 2,
+      "fps_suggestion": 12,
+      "frames": [
+        {
+          "file": "sprites/finisher/finisher_01.png",
+          "art_source": "constructed-inbetween"
+        },
+        {
+          "file": "sprites/finisher/finisher_02.png",
+          "art_source": "constructed-inbetween"
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "This is a concept/prototype pack made by extracting and cleaning AI-drawn sprite-atlas figures, then scaling to 1024x1024. It is NOT 68 individually painted native-resolution illustrations.",
+    "Several animation in-betweens use small affine poses or blended artwork, and need cleanup for production-ready seamless combat animation.",
+    "AI-generated source poses are approximate right-facing profile; some have three-quarter anatomy.",
+    "Sprites have a flat chroma green background, not transparent alpha. Fine edges may retain subtle artifacts."
+  ]
+}

@@ -508,6 +508,24 @@ export class Match {
           this.particles.push(p);
         }
       }
+    } else if (fin.effect === 'slice') {
+      // a flurry of cuts, then the opponent falls apart along one clean diagonal line
+      if (t < 36 && t % 6 === 0) {
+        this.cb.sfx('whoosh');
+        l.flash = 3;
+        this.sparks(cx + (Math.random() - 0.5) * 40, l.y + l.height * (0.3 + Math.random() * 0.5), 'blockSpark', 6);
+      }
+      if (t === 40) {
+        this.cb.sfx('slice');
+        this.shake = 10;
+        this.particles.push(this.part('flash', cx, cy, 0, 0, 12, 90, '#ffffff', 0));
+        for (let i = 0; i < 24; i++) {
+          const k = Math.random() - 0.5;
+          this.particles.push(this.part('spark', cx + k * 90, cy - k * 30, k * 10, (Math.random() - 0.5) * 3, 18, 3, fin.color, 0));
+        }
+      }
+      if (t > 40) l.slice = Math.min(1, (t - 40) / 100);
+      if (t === 140) l.hidden = true;
     } else {
       if (t < 40 && t % 3 === 0) this.ring(cx, cy, fin.color);
       if (t === 30) this.cb.sfx('vaporize');

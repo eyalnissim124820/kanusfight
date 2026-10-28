@@ -84,6 +84,11 @@ export class Audio {
         for (let i = 0; i < 6; i++) this.burst(0.25, 0.5, 'highpass', 4000 - i * 400, 800, i * 0.05);
         this.tone('sine', 120, 30, 0.6, 0.6);
         break;
+      case 'slice':
+        this.burst(0.08, 0.7, 'highpass', 6000, 3000);
+        this.tone('triangle', 2400, 1800, 0.6, 0.15, 0.02);
+        this.tone('sine', 3600, 3500, 0.9, 0.08, 0.02);
+        break;
       case 'vaporize': this.burst(1.2, 0.5, 'bandpass', 300, 4000); this.tone('sine', 400, 60, 1.2, 0.3); break;
       case 'bell': this.tone('triangle', 520, 515, 1.2, 0.35); this.tone('sine', 1040, 1030, 0.9, 0.15); break;
     }

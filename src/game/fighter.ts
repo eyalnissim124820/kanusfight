@@ -74,6 +74,7 @@ export class Fighter {
   /** Visual-only values driven by the match (finishers). */
   stone = 0;
   vanish = 0;
+  slice = 0; // 0..1: cut in two (finisher)
   hidden = false;
   walkPhase = 0;
 
@@ -100,7 +101,7 @@ export class Fighter {
     Object.assign(this, {
       x, y: 0, vx: 0, vy: 0, facing, health: 100, state: 'idle', t: 0, move: null, moveId: '',
       moveHit: false, stun: 0, hitstop: 0, flash: 0, invuln: 0, juggle: 0, combo: 0, thrower: null,
-      koed: false, toDizzy: false, canFinish: false, stone: 0, vanish: 0, hidden: false, airAttack: false,
+      koed: false, toDizzy: false, canFinish: false, stone: 0, vanish: 0, slice: 0, hidden: false, airAttack: false,
     });
     this.buffer = [];
     this.dirEvents = [];

@@ -70,7 +70,7 @@ export interface ProjectileDef {
 export type SfxName =
   | 'whoosh' | 'whooshHeavy' | 'hitLight' | 'hitHeavy' | 'block' | 'projectile'
   | 'teleport' | 'land' | 'thud' | 'quake' | 'throw' | 'select' | 'confirm'
-  | 'shatter' | 'vaporize' | 'bell';
+  | 'shatter' | 'vaporize' | 'slice' | 'bell';
 
 export interface MovePoses {
   windup: Pose;
@@ -125,7 +125,7 @@ export interface SpecialDef {
   move: MoveDef;
 }
 
-export type FinisherEffect = 'shatter' | 'vaporize';
+export type FinisherEffect = 'shatter' | 'vaporize' | 'slice';
 
 export interface FinisherDef {
   name: string;

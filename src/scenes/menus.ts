@@ -2,9 +2,7 @@ import type { App, Mode, Scene } from './scene';
 import { VIEW_W, VIEW_H } from '../game/match';
 import { ROSTER } from '../characters';
 import { STAGES, drawStage, getStage, GROUND_Y } from '../render/stage';
-import { drawSkeleton } from '../render/skeleton';
-import { posesFor } from '../render/fighterView';
-import { lerpPose } from '../render/poses';
+import { drawCharacter } from '../render/fighterView';
 import { text } from '../render/hud';
 import { FightScene } from './fight';
 import type { CharacterDef, MotionDir } from '../game/types';
@@ -13,10 +11,6 @@ import type { Difficulty } from '../game/ai';
 
 const DIFFS: Difficulty[] = ['easy', 'normal', 'hard'];
 
-function idlePose(def: CharacterDef, frame: number, phase = 0) {
-  const P = posesFor(def);
-  return lerpPose(P.idle, P.idle2, (Math.sin(frame * 0.08 + phase) + 1) / 2);
-}
 
 function dim(ctx: CanvasRenderingContext2D, a: number) {
   ctx.fillStyle = `rgba(0,0,0,${a})`;
@@ -51,8 +45,10 @@ export class TitleScene implements Scene {
   render(ctx: CanvasRenderingContext2D) {
     const f = this.app.frame;
     drawStage(ctx, getStage('ember'), 320 + Math.sin(f * 0.003) * 300, f);
-    drawSkeleton(ctx, ROSTER[0], idlePose(ROSTER[0], f), 230, GROUND_Y, 1, true);
-    drawSkeleton(ctx, ROSTER[1 % ROSTER.length], idlePose(ROSTER[1 % ROSTER.length], f, 1), 730, GROUND_Y, -1, true);
+    const left = ROSTER.find((c) => c.sprites) ?? ROSTER[0];
+    const right = ROSTER.find((c) => c !== left && !c.sprites) ?? ROSTER[1 % ROSTER.length];
+    drawCharacter(ctx, left, 'idle', f, 230, GROUND_Y, 1);
+    drawCharacter(ctx, right, 'idle', f, 730, GROUND_Y, -1, 1);
     dim(ctx, 0.35);
     text(ctx, "KANU'S FIGHT", VIEW_W / 2, 110, 96, '#f2d06b', 'center', '#3a0a00');
     text(ctx, 'A 2D ARCADE FIGHTER', VIEW_W / 2, 175, 24, '#ffffff');
@@ -159,9 +155,9 @@ export class SelectScene implements Scene {
       ctx.fillStyle = '#1a1420'; ctx.fillRect(x, y, cell, cell);
       ctx.save();
       ctx.beginPath(); ctx.rect(x, y, cell, cell); ctx.clip();
-      ctx.translate(x + cell / 2, y + cell + 120);
+      ctx.translate(x + cell / 2, y + cell + 66);
       ctx.scale(0.75, 0.75);
-      drawSkeleton(ctx, c, posesFor(c).idle, 0, 0, 1, true);
+      drawCharacter(ctx, c, 'idle', 0, 0, 0, 1);
       ctx.restore();
       [0, 1].forEach((side) => {
         if (this.cur[side] !== i) return;
@@ -175,7 +171,7 @@ export class SelectScene implements Scene {
     [0, 1].forEach((side) => {
       const c = ROSTER[this.cur[side]];
       const x = side === 0 ? 200 : 760;
-      drawSkeleton(ctx, c, idlePose(c, f, side), x, GROUND_Y, side === 0 ? 1 : -1, true);
+      drawCharacter(ctx, c, 'idle', f, x, GROUND_Y, side === 0 ? 1 : -1, side);
       text(ctx, c.name, x, 255, 44, side === 0 ? '#9fe3ff' : '#ffb3a8');
       text(ctx, c.title, x, 290, 18, '#ffffff');
       if (this.locked[side]) text(ctx, 'READY', x, 505, 30, '#f2d06b');
@@ -229,8 +225,7 @@ export class ResultScene implements Scene {
     const f = this.app.frame, w = this.winner.def;
     drawStage(ctx, getStage(this.setup.stage), 320, f);
     dim(ctx, 0.5);
-    const P = posesFor(w);
-    drawSkeleton(ctx, w, P.victory, VIEW_W / 2, GROUND_Y, 1, true);
+    drawCharacter(ctx, w, 'victory', f, VIEW_W / 2, GROUND_Y, 1);
     const label = this.setup.mode === '1p' ? (this.winner.side === 0 ? 'YOU WIN' : 'YOU LOSE') : `PLAYER ${this.winner.side + 1} WINS`;
     text(ctx, `${w.name} WINS THE MATCH`, VIEW_W / 2, 70, 56, '#f2d06b');
     text(ctx, label, VIEW_W / 2, 120, 28, '#ffffff');

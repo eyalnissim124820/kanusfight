@@ -10,7 +10,8 @@ import type { CharacterDef, Pose } from '../game/types';
  */
 export function runPoseSheet(canvas: HTMLCanvasElement) {
   const q = new URLSearchParams(location.search);
-  const chars = q.get('char') ? ROSTER.filter((c) => c.id === q.get('char')) : ROSTER;
+  // sprite-art characters have no skeleton poses to show
+  const chars = (q.get('char') ? ROSTER.filter((c) => c.id === q.get('char')) : ROSTER).filter((c) => !c.sprites);
   const CW = 150, CH = 230, COLS = 10;
   const entries: { def: CharacterDef; label: string; pose: Pose; grounded: boolean }[] = [];
   for (const def of chars) {

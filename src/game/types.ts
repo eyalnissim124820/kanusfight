@@ -186,16 +186,25 @@ export type BasePoseKey =
   | 'idle' | 'idle2' | 'walk1' | 'walk2' | 'crouch' | 'jump' | 'block' | 'crouchBlock'
   | 'hitHigh' | 'hitLow' | 'airHit' | 'lying' | 'getup' | 'dizzy' | 'victory' | 'throwing' | 'thrown';
 
-/** Optional sprite sheet. When present it replaces the procedural skeleton renderer. */
+/** One frame in a sprite atlas: [x, y, w, h, anchorX, anchorY]. The anchor is the point on the floor under the fighter. */
+export type SpriteFrame = [number, number, number, number, number, number];
+
+/** How one animation plays. Keys are animation names (see README → "Animation keys"). */
+export interface SpriteAnim {
+  use?: string; // play another animation's frames (e.g. closeHp → hp)
+  frames?: number[]; // pick / reorder frames of that animation
+  fps?: number; // for non-attack animations (default 10)
+  loop?: boolean; // default true for idle/walk/dizzy, false otherwise
+  hit?: number; // attacks: index of the strike frame shown during the active window
+}
+
+/** Optional sprite art. When present it replaces the procedural skeleton renderer. */
 export interface SpriteSheetDef {
-  src: string; // path under /public, e.g. "/sprites/kanu.png"
-  frameW: number;
-  frameH: number;
-  anchorX: number; // pixel inside a frame that sits on the fighter's ground position
-  anchorY: number;
-  scale?: number;
-  /** animation key -> row in the sheet, number of frames and playback rate */
-  anims: Record<string, { row: number; frames: number; fps?: number; loop?: boolean }>;
+  src: string; // image URL, e.g. "/sprites/taldan.webp" (file in /public)
+  atlas: Record<string, SpriteFrame[]>; // frames per animation, produced by tools/extract_sprites.py
+  standHeight: number; // pixel height of the idle pose; scaled to match the fighter's hurtbox height
+  scale?: number; // extra size multiplier (1 = hurtbox height)
+  play?: Record<string, SpriteAnim>;
 }
 
 export interface CharacterDef {

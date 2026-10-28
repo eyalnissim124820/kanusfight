@@ -1,5 +1,6 @@
 import type { Fighter } from '../game/fighter';
-import type { BasePoseKey, CharacterDef, Pose } from '../game/types';
+import type { BasePoseKey, CharacterDef, Pose, SpriteAnim, SpriteFrame, SpriteSheetDef } from '../game/types';
+import { characterHeight } from '../game/fighter';
 import { BASE_POSES, lerpPose, easeOut } from './poses';
 import { drawSkeleton, type DrawOpts } from './skeleton';
 
@@ -110,10 +111,63 @@ export function animKey(f: Fighter): string {
 }
 
 const spriteCache = new Map<string, HTMLImageElement>();
-function spriteImage(src: string) {
+/** Returns the loaded image, or null while it is still loading (the skeleton is drawn meanwhile). */
+export function spriteImage(src: string) {
   let img = spriteCache.get(src);
   if (!img) { img = new Image(); img.src = src; spriteCache.set(src, img); }
   return img.complete && img.naturalWidth ? img : null;
+}
+
+const LOOPING = new Set(['idle', 'walk', 'dizzy']);
+
+/** Resolve an animation key to its frames, following `use` aliases; falls back to idle. */
+export function spriteAnim(sp: SpriteSheetDef, key: string): { frames: SpriteFrame[]; anim: SpriteAnim } | null {
+  const anim = sp.play?.[key] ?? {};
+  let frames = sp.atlas[anim.use ?? key];
+  if (!frames) return key === 'idle' ? null : spriteAnim(sp, 'idle');
+  if (anim.frames) frames = anim.frames.map((i) => frames[i]).filter(Boolean);
+  return frames.length ? { frames, anim } : null;
+}
+
+/** Attack animations are driven by the move phases: windup frames → strike frame → recovery frames. */
+function attackFrame(f: Fighter, n: number, hitIdx: number | undefined) {
+  const m = f.move!;
+  if (n === 1) return 0;
+  const hit = Math.min(n - 1, hitIdx ?? (n >= 3 ? n - 2 : n - 1));
+  const ph = f.phase();
+  if (ph === 'startup') return hit === 0 ? 0 : Math.min(hit - 1, Math.floor((f.t / Math.max(1, m.startup)) * hit));
+  if (ph === 'active') return hit;
+  const after = n - 1 - hit;
+  if (after <= 0) return hit;
+  const k = (f.t - m.startup - m.active) / Math.max(1, m.recovery);
+  return Math.min(n - 1, hit + 1 + Math.floor(k * after));
+}
+
+function timedFrame(key: string, anim: SpriteAnim, n: number, t: number) {
+  const fi = Math.floor((t * (anim.fps ?? 10)) / 60);
+  return (anim.loop ?? LOOPING.has(key)) ? fi % n : Math.min(n - 1, fi);
+}
+
+function spriteFilter(opts: DrawOpts) {
+  const parts: string[] = [];
+  if (opts.stone) parts.push(`grayscale(${opts.stone})`, `contrast(${1 - 0.25 * opts.stone})`);
+  if (opts.tintAmt) parts.push(`sepia(${opts.tintAmt})`, `hue-rotate(${opts.tintAmt * 200}deg)`, `saturate(${1 + opts.tintAmt * 2})`);
+  if (opts.flash) parts.push(`brightness(${1 + opts.flash * 2})`);
+  return parts.length ? parts.join(' ') : 'none';
+}
+
+/** Draw one atlas frame with its anchor at (sx, sy). `height` is the on-screen standing height. */
+export function blitFrame(ctx: CanvasRenderingContext2D, img: HTMLImageElement, sp: SpriteSheetDef, fr: SpriteFrame,
+  sx: number, sy: number, facing: 1 | -1, height: number, opts: DrawOpts = {}) {
+  const [x, y, w, h, ax, ay] = fr;
+  const s = (height / sp.standHeight) * (sp.scale ?? 1);
+  ctx.save();
+  ctx.globalAlpha = opts.alpha ?? 1;
+  ctx.filter = spriteFilter(opts);
+  ctx.translate(sx, sy);
+  ctx.scale(facing * s, s);
+  ctx.drawImage(img, x, y, w, h, -ax, -ay, w, h);
+  ctx.restore();
 }
 
 /** Draw a fighter at screen position (sx, sy) where sy is the ground line. */
@@ -127,37 +181,38 @@ export function drawFighter(ctx: CanvasRenderingContext2D, f: Fighter, sx: numbe
     tintAmt: f.vanish,
   };
   const sp = f.def.sprites;
-  if (sp) {
-    const img = spriteImage(sp.src);
-    if (img) { drawSprite(ctx, f, img, sx, sy, opts); return; }
+  const img = sp && spriteImage(sp.src);
+  if (sp && img) {
+    const key = animKey(f);
+    const r = spriteAnim(sp, key);
+    if (r) {
+      const n = r.frames.length;
+      const i = f.state === 'attack' && f.move ? attackFrame(f, n, r.anim.hit) : timedFrame(key, r.anim, n, f.t);
+      blitFrame(ctx, img, sp, r.frames[i], sx, sy - f.y, f.facing, f.height, opts);
+      return;
+    }
   }
   const { pose, grounded } = resolvePose(f, frame);
   drawSkeleton(ctx, f.def, pose, sx, sy - f.y, f.facing, grounded, opts);
 }
 
-function drawSprite(ctx: CanvasRenderingContext2D, f: Fighter, img: HTMLImageElement, sx: number, sy: number, opts: DrawOpts) {
-  const sp = f.def.sprites!;
-  const key = animKey(f);
-  const a = sp.anims[key] ?? sp.anims.idle;
-  if (!a) return;
-  let frameIdx: number;
-  if (f.state === 'attack' && f.move) {
-    const total = f.move.startup + f.move.active + f.move.recovery;
-    frameIdx = Math.min(a.frames - 1, Math.floor((f.t / Math.max(1, total)) * a.frames));
-  } else {
-    const fi = Math.floor((f.t * (a.fps ?? 10)) / 60);
-    frameIdx = a.loop === false ? Math.min(a.frames - 1, fi) : fi % a.frames;
+/**
+ * Draw a character outside a fight (menus, portraits): sprite art when available, skeleton otherwise.
+ * `key` is an animation key such as 'idle' or 'victory'; `t` is a frame clock.
+ */
+export function drawCharacter(ctx: CanvasRenderingContext2D, def: CharacterDef, key: 'idle' | 'victory',
+  t: number, x: number, y: number, facing: 1 | -1, phase = 0) {
+  const sp = def.sprites;
+  const img = sp && spriteImage(sp.src);
+  if (sp && img) {
+    const r = spriteAnim(sp, key);
+    if (r) {
+      blitFrame(ctx, img, sp, r.frames[timedFrame(key, { fps: key === 'idle' ? 6 : 3, ...r.anim }, r.frames.length, t + phase * 20)],
+        x, y, facing, characterHeight(def));
+      return;
+    }
   }
-  const s = (sp.scale ?? 1) * f.def.body.scale;
-  ctx.save();
-  ctx.globalAlpha = opts.alpha ?? 1;
-  ctx.translate(sx, sy - f.y);
-  ctx.scale(f.facing * s, s);
-  ctx.drawImage(img, frameIdx * sp.frameW, a.row * sp.frameH, sp.frameW, sp.frameH, -sp.anchorX, -sp.anchorY, sp.frameW, sp.frameH);
-  if (opts.flash) {
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = 0.4;
-    ctx.drawImage(img, frameIdx * sp.frameW, a.row * sp.frameH, sp.frameW, sp.frameH, -sp.anchorX, -sp.anchorY, sp.frameW, sp.frameH);
-  }
-  ctx.restore();
+  const P = posesFor(def);
+  const pose = key === 'idle' ? lerpPose(P.idle, P.idle2, (Math.sin(t * 0.08 + phase) + 1) / 2) : P.victory;
+  drawSkeleton(ctx, def, pose, x, y, facing, true);
 }

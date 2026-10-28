@@ -2,7 +2,8 @@ import { Input } from './core/input';
 import { Audio } from './core/audio';
 import type { App, Mode, Scene } from './scenes/scene';
 import { TitleScene, createFight } from './scenes/menus';
-import { getCharacter } from './characters';
+import { getCharacter, ROSTER } from './characters';
+import { spriteImage } from './render/fighterView';
 import { VIEW_W, VIEW_H } from './game/match';
 import type { Difficulty } from './game/ai';
 import { runPoseSheet } from './tools/poseSheet';
@@ -15,6 +16,7 @@ if (q.get('tool') === 'poses') runPoseSheet(canvas);
 else startGame();
 
 function startGame() {
+  for (const c of ROSTER) if (c.sprites) spriteImage(c.sprites.src); // start loading art early
   const fit = () => {
     const s = Math.min(window.innerWidth / VIEW_W, window.innerHeight / VIEW_H);
     canvas.style.width = `${Math.floor(VIEW_W * s)}px`;

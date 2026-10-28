@@ -47,6 +47,7 @@ Directions are relative to facing (→ = toward the opponent).
 | Character | Specials | Finisher |
 |---|---|---|
 | **KANU** (heavy) | Thunder Orb ← → LP · Bull Charge → → HP · Quake Stomp ↓ ← HK | Shatter Fist → ↓ → HP (close) |
+| **TALDAN** (heavy, sprite art) | Power Blast ← → LP · Riot Rush → → HP | Final Verdict → ↓ → HP (any range) |
 | **NYX** (fast) | Moon Blade ← → HP · Shadow Step ↓ ← LP · Crescent Rise ↓ → HK · Talon Dive (air) ↓ HK | Eclipse → ← → LK (any range) |
 
 The finisher works in the deciding round: when the loser is stunned and **END IT!** appears.
@@ -72,28 +73,43 @@ Frame data is in 60 fps frames: `startup → active → recovery`. Hitboxes are 
 (x = distance in front of the fighter, y = height above the floor) and scale with `body.scale`.
 Press **F1** in a fight to see them.
 
-### Phase 2: replacing the stick-art with your own sprites
+### Sprite-art characters (Taldan is the reference)
 
-Add a `sprites` block to a character and it is drawn from a sprite sheet instead of the skeleton:
+**TALDAN** is drawn from AI-generated art instead of the stick-figure renderer. Here's the pipeline to add another character the same way:
+
+1. **Generate a pose sheet.** Every pose, side view, facing right, on a flat green (#00FF00) background, with a
+   black label bar above each strip of frames. Taldan's source is `art/taldan/source-sheet.webp`.
+2. **Describe the layout.** Copy `art/taldan/layout.json` and set, for each animation, which strip it's on (`bands`), its
+   x-range and its frame count.
+3. **Extract.** This keys out the green, cuts and aligns every frame on the feet, and packs a trimmed atlas:
+   ```bash
+   pip install pillow numpy scipy
+   python3 tools/extract_sprites.py art/<name>/layout.json
+   ```
+   It writes `public/sprites/<name>.webp` (the image) and `src/characters/sprites/<name>.json` (frame rectangles + anchors).
+4. **Character file.** Copy `src/characters/taldan.ts`, import the new atlas JSON, and add the character to `ROSTER`.
+
+The `sprites` block in a character file:
 
 ```ts
 sprites: {
-  src: '/sprites/kanu.png',          // put the file in public/sprites/
-  frameW: 256, frameH: 256,          // size of one frame
-  anchorX: 128, anchorY: 240,        // pixel in a frame that touches the floor
-  scale: 1,
-  anims: {                           // one row per animation
-    idle:   { row: 0, frames: 6, fps: 8 },
-    walk:   { row: 1, frames: 8, fps: 12 },
-    crouch: { row: 2, frames: 1 },
-    jump:   { row: 3, frames: 6, fps: 10, loop: false },
-    lp:     { row: 4, frames: 4 },    // attacks stretch over startup + active + recovery
-    // ...
+  src: '/sprites/taldan.webp',
+  atlas: atlas.frames,            // from the extractor
+  standHeight: atlas.standHeight, // art is scaled so the idle pose = the hurtbox height
+  play: {
+    idle: { fps: 6 },             // timed animations (idle/walk/dizzy loop by default)
+    hp: { hit: 2 },               // attacks: which frame is the strike (shown on active frames)
+    closeHp: { use: 'hp', frames: [0, 1], hit: 1 }, // reuse another animation's frames
+    throwing: { use: 'throw', frames: [2, 3], fps: 3, loop: false },
   },
 },
 ```
 
+Attacks follow the move's frame data: frames before `hit` play during startup, `hit` during the active window,
+and the rest during recovery. Any animation without art falls back to `idle`. Characters without `sprites` use
+the procedural skeleton.
+
 Animation keys: `idle walk crouch jump block crouchBlock hitHigh hitLow airHit lying getup dizzy victory
 throwing thrown finisher` plus every move id (`lp hp lk hk closeHp closeHk sweep roundhouse uppercut crouchLp
-crouchLk crouchHk jumpPunch jumpKick jumpUpKick throw`) and each special's `id`. A missing key falls back to `idle`.
-Use `/?tool=poses` as a reference for which poses each animation needs.
+crouchLk crouchHk jumpPunch jumpKick jumpUpKick throw`) and each special's `id`.
+For a stick-figure character, `/?tool=poses` shows which pose each animation needs.

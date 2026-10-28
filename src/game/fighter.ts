@@ -30,6 +30,12 @@ const DIR_MATCH: Record<MotionDir, number[]> = {
   DF: [3], DB: [1], UF: [9], UB: [7], N: [5],
 };
 
+/** Standing height in pixels (top of head to floor); also the size sprite art is scaled to. */
+export function characterHeight(def: CharacterDef) {
+  const b = def.body;
+  return ((b.thigh + b.shin) * 0.95 + b.torso + b.headR * 2 + 6) * b.scale;
+}
+
 export class Fighter {
   readonly def: CharacterDef;
   readonly side: 0 | 1;
@@ -87,10 +93,7 @@ export class Fighter {
 
   get scale() { return this.def.body.scale; }
   get airborne() { return this.y > 0 || this.vy > 0; }
-  get height() {
-    const b = this.def.body;
-    return ((b.thigh + b.shin) * 0.95 + b.torso + b.headR * 2 + 6) * b.scale;
-  }
+  get height() { return characterHeight(this.def); }
   isNeutral() { return NEUTRAL.includes(this.state) || this.state === 'land'; }
 
   resetForRound(x: number, facing: 1 | -1) {

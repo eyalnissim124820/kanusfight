@@ -16,7 +16,25 @@ const q = new URLSearchParams(location.search);
 if (q.get('tool') === 'poses') runPoseSheet(canvas);
 else startGame();
 
+/**
+ * iOS Safari ignores `user-scalable=no`: stop double-tap zoom (a second tap within 350ms is cancelled)
+ * and pinch zoom (Safari's gesture events). The CSS `touch-action: none` covers other browsers.
+ */
+function blockBrowserZoom() {
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = performance.now();
+    if (now - lastTouchEnd < 350) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+  document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+  for (const ev of ['gesturestart', 'gesturechange', 'gestureend']) {
+    document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+  }
+}
+
 function startGame() {
+  blockBrowserZoom();
   for (const c of ROSTER) if (c.sprites) spriteImage(c.sprites.src); // start loading art early
   const fit = () => {
     const s = Math.min(window.innerWidth / VIEW_W, window.innerHeight / VIEW_H);

@@ -56,7 +56,7 @@ export class TitleScene implements Scene {
       const label = i === 3 ? `DIFFICULTY: ${this.app.difficulty.toUpperCase()}` : s;
       text(ctx, label, VIEW_W / 2, 250 + i * 50, 36, i === this.sel ? '#ff3b2f' : '#ffffff');
     });
-    if (Math.floor(f / 30) % 2) text(ctx, 'ENTER / J TO SELECT', VIEW_W / 2, 515, 18, '#cccccc');
+    if (Math.floor(f / 30) % 2) text(ctx, this.app.touch ? 'STICK TO CHOOSE · HP OR LP TO SELECT' : 'ENTER / J TO SELECT', VIEW_W / 2, 515, 18, '#cccccc');
   }
 }
 
@@ -78,6 +78,7 @@ export class ControlsScene implements Scene {
       ['High Punch · Block · High Kick', 'U · I · O', 'Num7 · Num8 · Num9'],
       ['Low Punch · Block · Low Kick', 'J · K · L', 'Num4 · Num5 · Num6'],
       ['Gamepad', 'X/Y punch · A/B kick · LB/RB block', ''],
+      ['Touch screen', 'stick · HP LP HK LK · BLOCK · ★ = special', ''],
     ];
     rows.forEach((r, i) => {
       text(ctx, r[0], 40, 100 + i * 30, 20, i ? '#ffffff' : '#f2d06b', 'left');

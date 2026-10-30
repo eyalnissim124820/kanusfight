@@ -26,6 +26,7 @@ export class FightScene implements Scene {
       setup.mode === '2p' ? null : new AIController(b, this.match, app.difficulty),
     ];
     app.audio.startMusic();
+    app.touch?.setSpecials(setup.p1.specials.filter((s) => !s.air).map((s) => s.name));
   }
 
   private readInputs(): [InputFrame, InputFrame] {
@@ -34,6 +35,8 @@ export class FightScene implements Scene {
       if (this.setup.mode === '1p') return input.read(['p1', 'p2'], null); // any keyboard layout or pad
       return input.read([side === 0 ? 'p1' : 'p2'], side);
     };
+    // one-tap specials from the touch controls belong to player 1
+    if (!this.ai[0]) for (const i of input.specials) this.match.fighters[0].requestSpecial(i);
     return [this.ai[0] ? this.ai[0].poll() : human(0), this.ai[1] ? this.ai[1].poll() : human(1)];
   }
 

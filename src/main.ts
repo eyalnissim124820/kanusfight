@@ -7,6 +7,7 @@ import { spriteImage } from './render/fighterView';
 import { VIEW_W, VIEW_H } from './game/match';
 import type { Difficulty } from './game/ai';
 import { runPoseSheet } from './tools/poseSheet';
+import { isTouchDevice, setupTouchControls } from './core/touch';
 
 const canvas = document.getElementById('game') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -35,8 +36,9 @@ function startGame() {
   let scene: Scene;
   const app: App = {
     ctx, input, audio, frame: 0, difficulty: 'normal',
-    setScene(s) { scene = s; },
+    setScene(s) { scene = s; app.touch?.setInFight('match' in s); },
   };
+  if (isTouchDevice()) app.touch = setupTouchControls(input);
 
   // URL shortcuts for testing: ?mode=cpu&p1=kanu&p2=nyx&stage=moon&difficulty=hard
   if (q.get('difficulty')) app.difficulty = q.get('difficulty') as Difficulty;
@@ -44,6 +46,7 @@ function startGame() {
     scene = createFight(app, q.get('mode') as Mode, getCharacter(q.get('p1') ?? 'kanu'),
       getCharacter(q.get('p2') ?? 'nyx'), q.get('stage') ?? 'ember');
   } else scene = new TitleScene(app);
+  app.touch?.setInFight('match' in scene);
 
   // Fixed 60Hz simulation, decoupled from the display refresh rate.
   const STEP = 1000 / 60;

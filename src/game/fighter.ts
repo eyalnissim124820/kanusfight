@@ -21,7 +21,7 @@ export interface FighterHooks {
   teleport(f: Fighter): void;
   activeStart(f: Fighter, move: MoveDef): void;
   landed(f: Fighter, hard: boolean): void;
-  tryFinisher(f: Fighter): boolean;
+  tryFinisher(f: Fighter, quick?: boolean): boolean;
 }
 
 // Numpad notation (relative to facing): 7 8 9 / 4 5 6 / 1 2 3, where 6 = forward.
@@ -86,6 +86,11 @@ export class Fighter {
   private lastDir = 5;
   private dirEvents: { d: number; f: number }[] = [];
   private buffer: { b: ButtonName; ttl: number }[] = [];
+  /** One-tap special (touch controls): index into the character's specials, kept for a few frames. */
+  private quick: { i: number; ttl: number } | null = null;
+
+  /** Perform special #i without its motion (used by the mobile special buttons). */
+  requestSpecial(i: number) { this.quick = { i, ttl: 8 }; }
 
   constructor(def: CharacterDef, side: 0 | 1) {
     this.def = def;
@@ -137,6 +142,7 @@ export class Fighter {
     for (const e of this.buffer) e.ttl--;
     this.buffer = this.buffer.filter((e) => e.ttl > 0);
     if (this.invuln > 0) this.invuln--;
+    if (this.quick && --this.quick.ttl <= 0) this.quick = null;
 
     this.t++;
     this.step();
@@ -212,7 +218,9 @@ export class Fighter {
     this.juggle = 0;
     this.combo = 0;
 
+    if (this.canFinish && this.quick?.i === 0 && this.hooks.tryFinisher(this, true)) { this.quick = null; return; }
     if (this.canFinish && this.buffer.length && this.hooks.tryFinisher(this)) return;
+    if (this.tryQuick(false)) return;
     if (this.trySpecial(false)) return;
 
     const btn = this.takeButton();
@@ -238,7 +246,7 @@ export class Fighter {
 
   private airControl() {
     if (this.airAttack) return;
-    if (this.trySpecial(true)) { this.airAttack = true; return; }
+    if (this.tryQuick(true) || this.trySpecial(true)) { this.airAttack = true; return; }
     const btn = this.takeButton();
     if (!btn) return;
     this.airAttack = true;
@@ -287,6 +295,18 @@ export class Fighter {
     if (i < 0 || !this.matchMotion(motion)) return false;
     this.buffer.splice(i, 1);
     this.dirEvents = [];
+    return true;
+  }
+
+  private tryQuick(air: boolean) {
+    if (!this.quick) return false;
+    const list = this.def.specials.filter((s) => !!s.air === air);
+    // in the air either button gives the (first) air special
+    const s = air ? list[0] : list[this.quick.i];
+    if (!s || (s.move.projectile && this.hooks.hasProjectile(this))) return false;
+    this.quick = null;
+    this.dirEvents = [];
+    this.startMove(s.id, s.move);
     return true;
   }
 

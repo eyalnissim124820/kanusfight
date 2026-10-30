@@ -92,7 +92,7 @@ export class Match {
           for (let i = 0; i < 4; i++) this.dust(f.x + (Math.random() - 0.5) * 40, 1);
         }
       },
-      tryFinisher: (f: Fighter) => this.tryFinisher(f),
+      tryFinisher: (f: Fighter, quick?: boolean) => this.tryFinisher(f, quick),
     };
   }
 
@@ -394,11 +394,11 @@ export class Match {
     this.cb.sfx('hitHeavy');
   }
 
-  private tryFinisher(f: Fighter) {
+  private tryFinisher(f: Fighter, quick = false) {
     if (this.phase !== 'finish' || this.roundWinner !== f) return false;
     const fin = f.def.finisher, d = f.distTo(f.opponent);
     const inRange = fin.range === 'any' || (fin.range === 'close' ? d < 120 : d > 200);
-    if (!inRange || !f.consumeMotion(fin.motion, fin.button)) return false;
+    if (!inRange || (!quick && !f.consumeMotion(fin.motion, fin.button))) return false;
     const o = f.opponent;
     f.state = 'finisher'; f.t = 0; f.move = null; f.vx = 0;
     o.state = 'finished'; o.t = 0; o.vx = 0;

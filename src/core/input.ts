@@ -40,7 +40,32 @@ export class Input {
 
   /** Call once per simulation tick, after everything has read input. */
   endFrame() {
+    for (const c of this.releaseLater) this.down.delete(c);
+    this.releaseLater.clear();
     this.pressedThisFrame.clear();
+    this.specials = [];
+  }
+
+  // ---- virtual keys (touch controls press the same key codes the keyboard uses) ----
+  private releaseLater = new Set<string>();
+  /** One-tap special requests from the touch controls, consumed by the fight scene each tick. */
+  specials: number[] = [];
+
+  virtualDown(code: string) {
+    if (!this.down.has(code)) this.pressedThisFrame.add(code);
+    this.down.add(code);
+    this.releaseLater.delete(code);
+  }
+
+  virtualUp(code: string) {
+    // a tap shorter than one tick still has to be seen as held for one tick
+    if (this.pressedThisFrame.has(code)) this.releaseLater.add(code);
+    else this.down.delete(code);
+  }
+
+  virtualTap(code: string) {
+    this.virtualDown(code);
+    this.releaseLater.add(code);
   }
 
   pollPads() {

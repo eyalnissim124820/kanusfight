@@ -40,6 +40,11 @@ Either:
 
 In 1-player mode either keyboard layout works.
 
+**Phones and tablets** get on-screen controls automatically: a joystick (left), HP/LP/HK/LK + BLOCK (right),
+and pause. **★1 / ★2** perform the fighter's first two specials with one tap, no motion needed; during the
+"END IT!" window ★1 performs the finisher (if you're in range). The touch controls drive player 1 and the menus.
+Force them on or off with `?touch=1` / `?touch=0`.
+
 **Shared moves:** close LP = throw · close HP = elbow · close HK = knee · ←+LK = sweep · ←+HK = roundhouse ·
 ↓+HP = uppercut · ↓+LP/LK/HK = crouching attacks · punch/kick in the air = jump attacks.
 Directions are relative to facing (→ = toward the opponent).

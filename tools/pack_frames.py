@@ -7,10 +7,13 @@ pose sheet (for that, see extract_sprites.py).
 
     pip install pillow numpy scipy
     python3 tools/pack_frames.py <frames_dir> <out_image.webp> <out_atlas.json> [--scale 0.36] [--pivot 512,996]
+                                 [--anchor proj_x=0.88,0.5 ...]
 
 <frames_dir> must contain <anim>/<anim>_NN.png (e.g. idle/idle_01.png). Frames may be RGBA, or RGB on a
 flat green (#00FF00) background, which is keyed out. Every frame must share the same canvas
 placement: the pivot is the floor point under the fighter, the same for all frames.
+--anchor name=fx,fy overrides the pivot for one animation with a point inside its trimmed frame
+(fractions of width/height) — e.g. projectiles, anchored on their head.
 
 Output: a trimmed, shelf-packed WebP atlas plus JSON with [x, y, w, h, anchorX, anchorY] per frame,
 the same format extract_sprites.py writes.
@@ -26,8 +29,10 @@ ap.add_argument('out_image')
 ap.add_argument('out_json')
 ap.add_argument('--scale', type=float, default=0.36)
 ap.add_argument('--pivot', default='512,996')
+ap.add_argument('--anchor', action='append', default=[])
 args = ap.parse_args()
 PX, PY = (float(v) for v in args.pivot.split(','))
+ANCHORS = {a.split('=')[0]: tuple(float(v) for v in a.split('=')[1].split(',')) for a in args.anchor}
 
 
 def keyed(path):
@@ -59,7 +64,11 @@ for d in sorted(os.listdir(args.frames_dir)):
         crop = im.crop(bb)
         w, h = round(crop.width * args.scale), round(crop.height * args.scale)
         crop = crop.resize((max(1, w), max(1, h)), Image.LANCZOS)
-        frames.append((d, i, crop, (PX - bb[0]) * args.scale, (PY - bb[1]) * args.scale, (bb[3] - bb[1]) * args.scale))
+        if d in ANCHORS:
+            ax, ay = ANCHORS[d][0] * w, ANCHORS[d][1] * h
+        else:
+            ax, ay = (PX - bb[0]) * args.scale, (PY - bb[1]) * args.scale
+        frames.append((d, i, crop, ax, ay, (bb[3] - bb[1]) * args.scale))
 
 SHEET_W, GAP = 2048, 2
 x = y = shelf = 0

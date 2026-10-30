@@ -41,7 +41,8 @@ export const ben: CharacterDef = {
         name: 'Flying Shears', startup: 12, active: 1, recovery: 20, damage: 0, special: true, sfx: 'projectile',
         projectile: {
           speed: 10, w: 52, h: 18, y: 120, x: 64, damage: 8, chip: 1, hitstun: 22,
-          knockback: { x: 6, y: 0 }, life: 150, style: 'blade', color: '#e8f6ff', glow: '#7fd6ff',
+          knockback: { x: 6, y: 0 }, life: 150, style: 'blade', color: '#fff6c8', glow: '#ffc93a',
+          sprite: 'proj_flyingShears', // the flying scissors cut from art/ben/source-sheet.webp
         },
         poses: {
           windup: P({ torso: -6, fs: 160, fe: 40, bs: 20, be: 90 }),
@@ -76,7 +77,7 @@ export const ben: CharacterDef = {
     // How each animation plays. `hit` = strike frame shown on the move's active frames.
     play: {
       idle: { fps: 9 }, walk: { fps: 12 }, dizzy: { fps: 6 },
-      jump: { fps: 6, loop: false }, victory: { fps: 3, loop: false }, getup: { fps: 6 },
+      jump: { fps: 6, loop: false }, victory: { frames: [1] }, // victory_02, cleaned of a ghosted second figure getup: { fps: 6 },
       hitHigh: { fps: 12 }, hitLow: { fps: 12 }, airHit: { fps: 8 }, finisher: { fps: 4, loop: false },
       lp: { hit: 2 }, hp: { hit: 1 }, lk: { hit: 2 }, hk: { frames: [1, 2, 1], hit: 1 },
       sweep: { hit: 1 }, roundhouse: { hit: 2 }, uppercut: { hit: 1 }, crouchLk: { hit: 1 },

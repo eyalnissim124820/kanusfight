@@ -63,6 +63,7 @@ export interface ProjectileDef {
   height?: HitHeight;
   life: number; // frames
   style: 'orb' | 'blade' | 'bolt';
+  sprite?: string; // animation in the owner's sprite atlas drawn instead of the built-in effect
   color: string;
   glow: string;
 }

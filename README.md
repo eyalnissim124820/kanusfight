@@ -112,6 +112,10 @@ sprites: {
 },
 ```
 
+A projectile can use art too: put its frame in the atlas (e.g. `art/ben/sprites/proj_flyingShears/`, packed with
+`--anchor proj_flyingShears=0.88,0.5` so it's anchored on the scissors head) and set `sprite: 'proj_flyingShears'`
+in the special's `projectile`.
+
 Attacks follow the move's frame data: frames before `hit` play during startup, `hit` during the active window,
 and the rest during recovery. Any animation without art falls back to `idle`. Characters without `sprites` use
 the procedural skeleton.

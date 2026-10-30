@@ -1,6 +1,7 @@
 import type { Match, Particle, Projectile } from '../game/match';
 import { VIEW_W, VIEW_H, ROUNDS_TO_WIN } from '../game/match';
 import { GROUND_Y } from './stage';
+import { blitFrame, spriteImage } from './fighterView';
 
 export const FONT = '"Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif';
 
@@ -72,6 +73,11 @@ export function drawProjectile(ctx: CanvasRenderingContext2D, p: Projectile, cam
   ctx.fillStyle = g;
   ctx.fillRect(x - d.w, y - d.w, d.w * 2, d.w * 2);
   ctx.restore();
+  const sp = p.owner.def.sprites, img = sp && spriteImage(sp.src), fr = d.sprite && sp?.atlas[d.sprite]?.[0];
+  if (sp && img && fr) {
+    blitFrame(ctx, img, sp, fr, x, y, p.vx < 0 ? -1 : 1, p.owner.height);
+    return;
+  }
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(Math.sign(p.vx), 1);

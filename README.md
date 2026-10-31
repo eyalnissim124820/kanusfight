@@ -54,6 +54,7 @@ Directions are relative to facing (→ = toward the opponent).
 | **KANU** (heavy) | Thunder Orb ← → LP · Bull Charge → → HP · Quake Stomp ↓ ← HK | Shatter Fist → ↓ → HP (close) |
 | **TALDAN** (heavy, sprite art) | Power Blast ← → LP · Riot Rush → → HP | Final Verdict → ↓ → HP (any range) |
 | **BEN** (quick, sprite art) | Flying Shears ← → LP · Denim Lance ← → HK | Perfect Cut → ↓ → LK (close) |
+| **EYAL PRO MAX** (balanced, sprite art) | Hot Deploy ← → LP · Hotfix Rush → → HP | Ship It → ↓ → HP (any range) |
 | **NYX** (fast) | Moon Blade ← → HP · Shadow Step ↓ ← LP · Crescent Rise ↓ → HK · Talon Dive (air) ↓ HK | Eclipse → ← → LK (any range) |
 
 The finisher works in the deciding round: when the loser is stunned and **END IT!** appears.

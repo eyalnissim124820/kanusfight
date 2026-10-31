@@ -12,6 +12,7 @@ layout.json describes where each animation sits on the source sheet:
                        stripWhite    – remove white/light-grey pixels first (e.g. an opponent in a white outfit)
                        maxReach px   – per-animation reach crop (overrides the global one)
                        anchor 'center' – anchor on the bounding-box centre (projectiles)
+                       fadeLeft / fadeRight px – soften an effect cut off by the cell edge
   thinLines – true: erase 1–2px lines (cell borders) before finding frames
   centerAnchor – animations anchored on their bounding-box centre (airborne / lying poses)
   maxReach  – crop effects that reach further forward than this (source px)
@@ -137,7 +138,7 @@ def frames_for(anim, band, sec, n, opts=None):
             ax = float(np.argmax(np.convolve(m.sum(0).astype(float), np.ones(15) / 15, 'same')))
         ay = fy1c if opts.get('anchor') == 'center' else fy1
         res.append({'anim': anim, 'i': i, 'mask': m, 'box': (fx0, fy0, fx1, fy1), 'ax': ax, 'ay': ay, 'ox': x0, 'oy': y0,
-                    'reach': opts.get('maxReach', MAX_REACH)})
+                    'reach': opts.get('maxReach', MAX_REACH), 'fade': (opts.get('fadeLeft', 0), opts.get('fadeRight', 0))})
     return res
 
 
@@ -147,6 +148,15 @@ def rgba(f):
     rgb = im[Y0:f['oy'] + fy1, X0:f['ox'] + fx1].copy()
     k = key[Y0:f['oy'] + fy1, X0:f['ox'] + fx1]
     a = np.clip((70 - k) / 50.0, 0, 1) * f['mask'][fy0:fy1, fx0:fx1]  # soft chroma key
+    fl, fr = f.get('fade', (0, 0))
+    w = a.shape[1]
+    ramp = np.ones(w)
+    if fl: ramp *= np.clip(np.arange(w) / fl, 0, 1)
+    if fr: ramp *= np.clip((w - 1 - np.arange(w)) / fr, 0, 1)
+    if f.get('reach', 9999) < w:  # the reach crop happens later: fade towards the crop line instead
+        cut = int(f['ax'] - fx0 + f['reach'])
+        if fr: ramp *= np.clip((cut - np.arange(w)) / fr, 0, 1)
+    a = a * ramp[None, :]
     mx = np.maximum(rgb[..., 0], rgb[..., 2])
     rgb[..., 1] = np.where(rgb[..., 1] > mx, (mx * 0.7 + rgb[..., 1] * 0.3).astype(np.int32), rgb[..., 1])  # despill
     return Image.fromarray(np.dstack([rgb, (a * 255).astype(np.int32)]).astype(np.uint8), 'RGBA')

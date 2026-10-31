@@ -69,5 +69,8 @@
   "jump",
   "jumpKick",
   "jumpPunch"
+ ],
+ "align": [
+  "idle"
  ]
 }

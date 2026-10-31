@@ -22,6 +22,9 @@ lowest pixel (or the box centre for airborne animations). Keys (all optional):
                          larger); the frames are shrunk by 1/s so every animation matches
   "center": [anim, …]  – anchor on the bounding-box centre (jumps, air hits)
   "fadeRight": {anim: px} – soften an effect cut off by the right image edge
+  "align":  [anim, …]  – register every frame of the animation onto its first frame (scale from the whole
+                         silhouette, position from the feet), so a loop such as idle doesn't jitter when
+                         the frames were generated or enlarged separately. Overrides "size" for those frames.
 
 Output: a trimmed, shelf-packed WebP atlas plus JSON with [x, y, w, h, anchorX, anchorY] per frame,
 the same format extract_sprites.py writes.
@@ -67,6 +70,36 @@ def keyed(path):
     return Image.fromarray(np.dstack([r, g2, b, (alpha * 255).astype(np.int32)]).astype(np.uint8), 'RGBA')
 
 
+def silhouette(im, n=512):
+    return np.asarray(im.getchannel('A').resize((n, n), Image.BILINEAR), float) / 255
+
+
+def register(R, img, n=512):
+    """Scale s and shift (dx, dy) so that R ≈ img scaled by s and shifted (in n-px units)."""
+    F = np.fft.rfft2(R, (2 * n, 2 * n))
+    best = (-1,)
+    for s in np.arange(0.85, 1.151, 0.005):
+        w = int(round(n * s))
+        I = np.zeros((n, n))
+        Ir = np.asarray(Image.fromarray((img * 255).astype(np.uint8)).resize((w, w), Image.BILINEAR), float) / 255
+        I[:min(n, w), :min(n, w)] = Ir[:n, :n]
+        c = np.fft.irfft2(F * np.conj(np.fft.rfft2(I, (2 * n, 2 * n))), (2 * n, 2 * n))
+        iy, ix = np.unravel_index(np.argmax(c), c.shape)
+        iou = c[iy, ix] / (R.sum() + I.sum() - c[iy, ix])
+        if iou > best[0]:
+            best = (iou, s, I)
+    _, s, I = best
+    # position from the feet: correlate only the lowest 15% of the reference silhouette
+    rows = np.nonzero(R.max(1) > 0.5)[0]
+    band = R.copy()
+    band[:int(rows[-1] - 0.15 * (rows[-1] - rows[0]))] = 0
+    c = np.fft.irfft2(np.fft.rfft2(band, (2 * n, 2 * n)) * np.conj(np.fft.rfft2(I, (2 * n, 2 * n))), (2 * n, 2 * n))
+    iy, ix = np.unravel_index(np.argmax(c), c.shape)
+    return s, (ix if ix < n else ix - 2 * n), (iy if iy < n else iy - 2 * n)
+
+
+ALIGN = set(CFG.get('align', [])) if CFG else set()
+refs = {}
 frames = []
 for d in sorted(os.listdir(args.frames_dir)):
     files = sorted(glob.glob(os.path.join(args.frames_dir, d, '*.png')))
@@ -96,6 +129,16 @@ for d in sorted(os.listdir(args.frames_dir)):
             ax, ay = ax * sc, ay * sc
         else:
             ax, ay = (PX - bb[0]) * sc, (PY - bb[1]) * sc
+        if d in ALIGN:
+            full = im.size[0] / 512
+            if d not in refs:  # the first frame is the reference
+                refs[d] = (silhouette(im), sc, ax / sc + bb[0], ay / sc + bb[1])
+            else:
+                R, rsc, rax, ray = refs[d]
+                k, dx, dy = register(R, silhouette(im))
+                sc = rsc * k  # this frame's pixels map onto the reference by ref = k * px + shift
+                w, h = round(crop.width * sc), round(crop.height * sc)
+                ax, ay = ((rax - dx * full) / k - bb[0]) * sc, ((ray - dy * full) / k - bb[1]) * sc
         crop = crop.resize((max(1, w), max(1, h)), Image.LANCZOS)
         frames.append((d, i, crop, ax, ay, (bb[3] - bb[1]) * sc))
 

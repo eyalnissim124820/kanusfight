@@ -76,7 +76,7 @@ export const eyal: CharacterDef = {
     standHeight: atlas.standHeight,
     // How each animation plays. `hit` = strike frame shown on the move's active frames.
     play: {
-      idle: { fps: 7 }, walk: { fps: 10 }, dizzy: { fps: 5 },
+      idle: { frames: [0, 1, 2, 3, 2, 1], fps: 7 }, walk: { fps: 10 }, dizzy: { fps: 5 }, // idle plays back and forth
       jump: { fps: 6, loop: false }, victory: { fps: 3, loop: false }, getup: { fps: 6 },
       hitHigh: { fps: 12 }, hitLow: { fps: 12 }, airHit: { fps: 8 },
       finisher: { fps: 4, loop: false }, // lightning punch, then the power pose

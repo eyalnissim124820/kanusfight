@@ -4,6 +4,8 @@ import { ROSTER } from '../characters';
 import { STAGES, drawStage, getStage, GROUND_Y } from '../render/stage';
 import { drawCharacter } from '../render/fighterView';
 import { text } from '../render/hud';
+import { drawTitleBackdrop, drawTitlePlaque } from '../render/titleBackdrop';
+import { drawMenuButton, drawMenuHeading } from '../render/menuUi';
 import { FightScene } from './fight';
 import type { CharacterDef, MotionDir } from '../game/types';
 import type { Fighter } from '../game/fighter';
@@ -19,44 +21,78 @@ function dim(ctx: CanvasRenderingContext2D, a: number) {
 
 // ---------------- Title ----------------
 
+/** Two different random roster indices: the fighters shown on the title and pre-selected on character select. */
+function randomPair(): [number, number] {
+  const n = ROSTER.length;
+  const a = Math.floor(Math.random() * n);
+  const b = n > 1 ? (a + 1 + Math.floor(Math.random() * (n - 1))) % n : a;
+  return [a, b];
+}
+
+/** The title backdrop with the two featured fighters standing on the terrace. */
+function drawTitleScene(ctx: CanvasRenderingContext2D, app: App, pair: [number, number]) {
+  const f = app.frame;
+  drawTitleBackdrop(ctx, f);
+  drawCharacter(ctx, ROSTER[pair[0]], 'idle', f, 140, GROUND_Y, 1);
+  drawCharacter(ctx, ROSTER[pair[1]], 'idle', f, VIEW_W - 140, GROUND_Y, -1, 1);
+}
+
+/** Centred column of plaque buttons; `header` (if any) sits above them. `choices` lists the items that cycle with left/right. */
+function drawMenu(ctx: CanvasRenderingContext2D, items: string[], sel: number, header?: string, choices: number[] = []) {
+  let y = 262;
+  if (header) { drawMenuHeading(ctx, header, VIEW_W / 2, y - 8); y += 46; }
+  items.forEach((s, i) => drawMenuButton(ctx, s, VIEW_W / 2, y + i * 52, i === sel, choices.includes(i)));
+}
+
 export class TitleScene implements Scene {
   private sel = 0;
-  private items = ['1 PLAYER', '2 PLAYERS', 'CPU VS CPU', 'DIFFICULTY', 'CONTROLS & MOVES'];
-  constructor(private app: App) { app.audio.stopMusic(); }
+  private settings = false;
+  private pair: [number, number];
+
+  constructor(private app: App, opts: { settings?: boolean; pair?: [number, number] } = {}) {
+    app.audio.stopMusic();
+    this.pair = opts.pair ?? randomPair();
+    if (opts.settings) { this.settings = true; this.sel = 1; }
+  }
+
+  private items(): string[] {
+    return this.settings
+      ? [`DIFFICULTY: ${this.app.difficulty.toUpperCase()}`, 'CONTROLS & MOVES', 'BACK']
+      : ['1 PLAYER', '2 PLAYERS', 'SETTINGS'];
+  }
+
+  private cycleDifficulty(d: number) {
+    this.app.difficulty = DIFFS[(DIFFS.indexOf(this.app.difficulty) + d + 3) % 3];
+  }
+
+  private open(settings: boolean) { this.settings = settings; this.sel = settings ? 0 : 2; }
 
   update() {
     const { input, audio } = this.app;
-    if (input.menuUp()) { this.sel = (this.sel + this.items.length - 1) % this.items.length; audio.play('select'); }
-    if (input.menuDown()) { this.sel = (this.sel + 1) % this.items.length; audio.play('select'); }
-    if (this.sel === 3 && (input.menuLeft() || input.menuRight())) {
-      const d = input.menuLeft() ? -1 : 1;
-      this.app.difficulty = DIFFS[(DIFFS.indexOf(this.app.difficulty) + d + 3) % 3];
+    const n = this.items().length;
+    if (input.menuUp()) { this.sel = (this.sel + n - 1) % n; audio.play('select'); }
+    if (input.menuDown()) { this.sel = (this.sel + 1) % n; audio.play('select'); }
+    if (this.settings && this.sel === 0 && (input.menuLeft() || input.menuRight())) {
+      this.cycleDifficulty(input.menuLeft() ? -1 : 1);
       audio.play('select');
     }
+    if (this.settings && input.back()) { audio.play('select'); this.open(false); return; }
     if (input.confirm()) {
       audio.unlock();
       audio.play('confirm');
-      if (this.sel <= 2) this.app.setScene(new SelectScene(this.app, (['1p', '2p', 'cpu'] as Mode[])[this.sel]));
-      else if (this.sel === 3) this.app.difficulty = DIFFS[(DIFFS.indexOf(this.app.difficulty) + 1) % 3];
-      else this.app.setScene(new ControlsScene(this.app));
+      if (!this.settings) {
+        if (this.sel === 2) this.open(true);
+        else this.app.setScene(new SelectScene(this.app, this.sel === 0 ? '1p' : '2p', this.pair));
+      } else if (this.sel === 0) this.cycleDifficulty(1);
+      else if (this.sel === 1) this.app.setScene(new ControlsScene(this.app, this.pair));
+      else this.open(false);
     }
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    const f = this.app.frame;
-    drawStage(ctx, getStage('ember'), 320 + Math.sin(f * 0.003) * 300, f);
-    const left = ROSTER.find((c) => c.sprites) ?? ROSTER[0];
-    const right = ROSTER.find((c) => c !== left && !c.sprites) ?? ROSTER[1 % ROSTER.length];
-    drawCharacter(ctx, left, 'idle', f, 230, GROUND_Y, 1);
-    drawCharacter(ctx, right, 'idle', f, 730, GROUND_Y, -1, 1);
-    dim(ctx, 0.35);
-    text(ctx, "KANU'S FIGHT", VIEW_W / 2, 110, 96, '#f2d06b', 'center', '#3a0a00');
-    text(ctx, 'A 2D ARCADE FIGHTER', VIEW_W / 2, 175, 24, '#ffffff');
-    this.items.forEach((s, i) => {
-      const label = i === 3 ? `DIFFICULTY: ${this.app.difficulty.toUpperCase()}` : s;
-      text(ctx, label, VIEW_W / 2, 250 + i * 50, 36, i === this.sel ? '#ff3b2f' : '#ffffff');
-    });
-    if (Math.floor(f / 30) % 2) text(ctx, this.app.touch ? 'STICK TO CHOOSE · HP OR LP TO SELECT' : 'ENTER / J TO SELECT', VIEW_W / 2, 515, 18, '#cccccc');
+    drawTitleScene(ctx, this.app, this.pair);
+    drawMenu(ctx, this.items(), this.sel, this.settings ? 'SETTINGS' : undefined, this.settings ? [0] : []);
+    drawTitlePlaque(ctx, !!this.app.touch);
   }
 }
 
@@ -64,13 +100,30 @@ export class TitleScene implements Scene {
 
 const arrow = (d: MotionDir) => ({ F: '→', B: '←', U: '↑', D: '↓', DF: '↘', DB: '↙', UF: '↗', UB: '↖', N: '·' })[d];
 
+/** Fighters whose move lists share one page of the Controls screen. */
+const MOVES_PER_PAGE = 2;
+
 export class ControlsScene implements Scene {
-  constructor(private app: App) {}
+  private page = 0;
+  private readonly pages = Math.ceil(ROSTER.length / MOVES_PER_PAGE);
+  constructor(private app: App, private pair?: [number, number]) {}
   update() {
-    if (this.app.input.back() || this.app.input.confirm()) { this.app.audio.play('select'); this.app.setScene(new TitleScene(this.app)); }
+    const { input, audio } = this.app;
+    if (this.pages > 1 && (input.menuLeft() || input.menuRight())) {
+      this.page = (this.page + (input.menuLeft() ? this.pages - 1 : 1)) % this.pages;
+      audio.play('select');
+    }
+    if (input.back() || input.confirm()) {
+      this.app.audio.play('select');
+      this.app.setScene(new TitleScene(this.app, { settings: true, pair: this.pair }));
+    }
   }
   render(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = '#0d0a12'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+    drawTitleBackdrop(ctx, this.app.frame);
+    ctx.fillStyle = 'rgba(13,10,18,0.92)';
+    ctx.beginPath();
+    ctx.roundRect(20, 14, VIEW_W - 40, VIEW_H - 28, 14);
+    ctx.fill();
     text(ctx, 'CONTROLS', VIEW_W / 2, 40, 48, '#f2d06b');
     const rows: [string, string, string][] = [
       ['', 'PLAYER 1', 'PLAYER 2'],
@@ -81,33 +134,35 @@ export class ControlsScene implements Scene {
       ['Touch screen', 'stick · HP LP HK LK · BLOCK · ★ = special', ''],
     ];
     rows.forEach((r, i) => {
-      text(ctx, r[0], 40, 100 + i * 30, 20, i ? '#ffffff' : '#f2d06b', 'left');
-      text(ctx, r[1], 450, 100 + i * 30, 20, i ? '#9fe3ff' : '#f2d06b', 'left');
-      text(ctx, r[2], 730, 100 + i * 30, 20, i ? '#ffb3a8' : '#f2d06b', 'left');
+      text(ctx, r[0], 40, 88 + i * 28, 20, i ? '#ffffff' : '#f2d06b', 'left');
+      text(ctx, r[1], 450, 88 + i * 28, 20, i ? '#9fe3ff' : '#f2d06b', 'left');
+      text(ctx, r[2], 730, 88 + i * 28, 20, i ? '#ffb3a8' : '#f2d06b', 'left');
     });
     text(ctx, 'Close LP throw · close HP elbow · close HK knee · ←+LK sweep · ←+HK roundhouse · ↓+HP uppercut',
       VIEW_W / 2, 262, 17, '#dddddd');
-    ROSTER.forEach((c, i) => {
+    ROSTER.slice(this.page * MOVES_PER_PAGE, (this.page + 1) * MOVES_PER_PAGE).forEach((c, i) => {
       const x = 40 + i * 460;
       text(ctx, `${c.name} — ${c.title}`, x, 305, 24, '#f2d06b', 'left');
       const lines = c.specials.map((s) => `${s.name}: ${s.air ? '(air) ' : ''}${s.motion.map(arrow).join(' ')} + ${s.button}`);
       lines.push(`FINISHER ${c.finisher.name}: ${c.finisher.motion.map(arrow).join(' ')} + ${c.finisher.button} (${c.finisher.range})`);
       lines.forEach((l, j) => text(ctx, l, x, 340 + j * 28, 18, j === lines.length - 1 ? '#ff8a7a' : '#ffffff', 'left'));
     });
-    text(ctx, 'Arrows are relative to facing (→ = toward the opponent). Esc / Enter to return.', VIEW_W / 2, 515, 16, '#999999');
+    if (this.pages > 1) text(ctx, `◀  FIGHTERS ${this.page + 1} / ${this.pages}  ▶`, VIEW_W / 2, 488, 20, '#f2d06b');
+    text(ctx, 'Arrows are relative to facing (→ = toward the opponent). ◀ ▶ more fighters · Esc / Enter to return.', VIEW_W / 2, 515, 16, '#999999');
   }
 }
 
 // ---------------- Character select ----------------
 
 export class SelectScene implements Scene {
-  private cur = [0, Math.min(1, ROSTER.length - 1)];
+  private cur: number[];
   private locked = [false, false];
   private t = 0;
   private stageIdx = Math.floor(Math.random() * STAGES.length);
 
-  constructor(private app: App, private mode: Mode) {
-    if (mode === 'cpu') this.locked = [false, false];
+  /** `start` is the pair of roster indices the two cursors begin on (random when not given). */
+  constructor(private app: App, private mode: Mode, start: [number, number] = randomPair()) {
+    this.cur = [...start];
   }
 
   /** Who controls each cursor: in 1P / CPU modes player 1 picks both sides in order. */
@@ -144,8 +199,8 @@ export class SelectScene implements Scene {
 
   render(ctx: CanvasRenderingContext2D) {
     const f = this.app.frame;
-    drawStage(ctx, getStage(STAGES[this.stageIdx].id), 320, f);
-    dim(ctx, 0.55);
+    drawTitleBackdrop(ctx, f, { logo: false });
+    dim(ctx, 0.35);
     text(ctx, 'CHOOSE YOUR FIGHTER', VIEW_W / 2, 44, 52, '#f2d06b');
     const who = this.mode === '2p' ? '' : this.locked[0] ? 'PICK YOUR OPPONENT' : this.mode === 'cpu' ? 'PICK CPU 1' : 'PICK YOUR FIGHTER';
     if (who) text(ctx, who, VIEW_W / 2, 88, 22, '#ffffff');
@@ -218,7 +273,7 @@ export class ResultScene implements Scene {
       audio.play('confirm');
       const s = this.setup;
       if (this.sel === 0) this.app.setScene(createFight(this.app, s.mode, s.p1, s.p2, s.stage));
-      else if (this.sel === 1) this.app.setScene(new SelectScene(this.app, s.mode));
+      else if (this.sel === 1) this.app.setScene(new SelectScene(this.app, s.mode, [ROSTER.indexOf(s.p1), ROSTER.indexOf(s.p2)]));
       else this.app.setScene(new TitleScene(this.app));
     }
   }

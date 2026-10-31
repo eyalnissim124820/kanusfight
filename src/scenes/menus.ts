@@ -11,6 +11,9 @@ import type { Difficulty } from '../game/ai';
 
 const DIFFS: Difficulty[] = ['easy', 'normal', 'hard'];
 
+const titleBg = new Image();
+titleBg.src = '/backgrounds/title.webp';
+
 
 function dim(ctx: CanvasRenderingContext2D, a: number) {
   ctx.fillStyle = `rgba(0,0,0,${a})`;
@@ -43,20 +46,28 @@ export class TitleScene implements Scene {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    const f = this.app.frame;
-    drawStage(ctx, getStage('ember'), 320 + Math.sin(f * 0.003) * 300, f);
-    const left = ROSTER.find((c) => c.sprites) ?? ROSTER[0];
-    const right = ROSTER.find((c) => c !== left && !c.sprites) ?? ROSTER[1 % ROSTER.length];
-    drawCharacter(ctx, left, 'idle', f, 230, GROUND_Y, 1);
-    drawCharacter(ctx, right, 'idle', f, 730, GROUND_Y, -1, 1);
-    dim(ctx, 0.35);
-    text(ctx, "KANU'S FIGHT", VIEW_W / 2, 110, 96, '#f2d06b', 'center', '#3a0a00');
-    text(ctx, 'A 2D ARCADE FIGHTER', VIEW_W / 2, 175, 24, '#ffffff');
+    if (titleBg.complete && titleBg.naturalWidth) {
+      // The artwork carries the logo and the "ENTER / J TO SELECT" plaque itself.
+      ctx.drawImage(titleBg, 0, 0, VIEW_W, VIEW_H);
+    } else {
+      ctx.fillStyle = '#2a1340'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+      text(ctx, "KANU'S FIGHT", VIEW_W / 2, 110, 96, '#f2d06b', 'center', '#3a0a00');
+    }
+    // Soft panel behind the menu so it reads over the sea and balustrade.
+    ctx.fillStyle = 'rgba(20,8,30,0.55)';
+    ctx.beginPath();
+    ctx.roundRect(VIEW_W / 2 - 200, 222, 400, 256, 14);
+    ctx.fill();
     this.items.forEach((s, i) => {
       const label = i === 3 ? `DIFFICULTY: ${this.app.difficulty.toUpperCase()}` : s;
-      text(ctx, label, VIEW_W / 2, 250 + i * 50, 36, i === this.sel ? '#ff3b2f' : '#ffffff');
+      text(ctx, label, VIEW_W / 2, 250 + i * 50, 32, i === this.sel ? '#ff3b2f' : '#ffffff');
     });
-    if (Math.floor(f / 30) % 2) text(ctx, this.app.touch ? 'STICK TO CHOOSE · HP OR LP TO SELECT' : 'ENTER / J TO SELECT', VIEW_W / 2, 515, 18, '#cccccc');
+    if (this.app.touch) {
+      // Cover the baked-in keyboard hint with the touch one.
+      ctx.fillStyle = '#3a1a10';
+      ctx.fillRect(VIEW_W / 2 - 150, 492, 300, 26);
+      text(ctx, 'STICK TO CHOOSE · HP OR LP TO SELECT', VIEW_W / 2, 505, 14, '#f2e2b8');
+    }
   }
 }
 

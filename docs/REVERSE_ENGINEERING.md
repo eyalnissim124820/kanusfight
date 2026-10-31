@@ -5,8 +5,8 @@ Source analysed: the 1995 DOS release of *Mortal Kombat II* (Acclaim/Midway). Th
 
 **Nothing from the original package is used in this project.** No sprites, sounds, music, character
 designs, names or text were copied. We studied it only for **game design and mechanics**. Everything in
-`src/` is new code. The characters (Kanu, Nyx), stages, effects and audio are all original: drawn and
-synthesized procedurally.
+`src/` is new code. The stages, effects and audio are all original: drawn and synthesized procedurally.
+The fighters are the project owner's own characters, drawn from their own art.
 
 ## 1. What is in the package
 

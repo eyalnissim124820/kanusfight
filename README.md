@@ -18,8 +18,8 @@ npm run build      # type-check + production build into dist/
 ```
 
 Handy URLs:
-- `/?mode=cpu&p1=kanu&p2=nyx&stage=moon&difficulty=hard`: jump straight into a fight (`mode` = `1p`, `2p` or `cpu`)
-- `/?tool=poses` (or `&char=kanu`): a sheet of every pose for every character. Press **D** to download it as a PNG.
+- `/?mode=cpu&p1=taldan&p2=ben&stage=moon&difficulty=hard`: jump straight into a fight (`mode` = `1p`, `2p` or `cpu`)
+- `/?tool=poses` (or `&char=taldan`): a sheet of every pose for every character. Press **D** to download it as a PNG.
 - In a fight: **F1** shows hitboxes and states, **Esc/P** pauses, **M** turns music on/off, **N** mutes.
 
 ## Deploy to Vercel
@@ -51,19 +51,17 @@ Directions are relative to facing (→ = toward the opponent).
 
 | Character | Specials | Finisher |
 |---|---|---|
-| **KANU** (heavy) | Thunder Orb ← → LP · Bull Charge → → HP · Quake Stomp ↓ ← HK | Shatter Fist → ↓ → HP (close) |
 | **TALDAN** (heavy, sprite art) | Power Blast ← → LP · Riot Rush → → HP | Final Verdict → ↓ → HP (any range) |
 | **BEN** (quick, sprite art) | Flying Shears ← → LP · Denim Lance ← → HK | Perfect Cut → ↓ → LK (close) |
 | **EYAL PRO MAX** (balanced, sprite art) | Hot Deploy ← → LP · Hotfix Rush → → HP | Ship It → ↓ → HP (any range) |
 | **KLEIN** (brawler, sprite art) | Guitar Smash ← → HP · Power Chord ↓ → LP | Encore → ↓ → HP (close) |
-| **NYX** (fast) | Moon Blade ← → HP · Shadow Step ↓ ← LP · Crescent Rise ↓ → HK · Talon Dive (air) ↓ HK | Eclipse → ← → LK (any range) |
 
 The finisher works in the deciding round: when the loser is stunned and **END IT!** appears.
 
 ## Making your own characters
 
-Each character is one data file. Copy `src/characters/kanu.ts` (heavy) or `src/characters/nyx.ts` (light),
-edit it, and add it to `ROSTER` in `src/characters/index.ts`. The select screen, CPU opponent and move list
+Each character is one data file. Copy `src/characters/taldan.ts` (art from a pose sheet) or
+`src/characters/ben.ts` (art as one image per frame), edit it, and add it to `ROSTER` in `src/characters/index.ts`. The select screen, CPU opponent and move list
 pick it up automatically.
 
 A `CharacterDef` contains:

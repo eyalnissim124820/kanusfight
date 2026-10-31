@@ -6,7 +6,7 @@ import type { CharacterDef, Pose } from '../game/types';
 /**
  * Developer tool: open /?tool=poses to see every pose of every character on one sheet.
  * Press D to download the sheet as a PNG — handy as a reference for drawing sprites in phase 2.
- * Use ?tool=poses&char=kanu to show a single character.
+ * Use ?tool=poses&char=taldan to show a single character.
  */
 export function runPoseSheet(canvas: HTMLCanvasElement) {
   const q = new URLSearchParams(location.search);

@@ -37,11 +37,11 @@ function drawTitleScene(ctx: CanvasRenderingContext2D, app: App, pair: [number, 
   drawCharacter(ctx, ROSTER[pair[1]], 'idle', f, VIEW_W - 140, GROUND_Y, -1, 1);
 }
 
-/** Centred column of plaque buttons; `header` (if any) sits above them. */
-function drawMenu(ctx: CanvasRenderingContext2D, items: string[], sel: number, header?: string) {
+/** Centred column of plaque buttons; `header` (if any) sits above them. `choices` lists the items that cycle with left/right. */
+function drawMenu(ctx: CanvasRenderingContext2D, items: string[], sel: number, header?: string, choices: number[] = []) {
   let y = 262;
   if (header) { drawMenuHeading(ctx, header, VIEW_W / 2, y - 8); y += 46; }
-  items.forEach((s, i) => drawMenuButton(ctx, s, VIEW_W / 2, y + i * 52, i === sel));
+  items.forEach((s, i) => drawMenuButton(ctx, s, VIEW_W / 2, y + i * 52, i === sel, choices.includes(i)));
 }
 
 export class TitleScene implements Scene {
@@ -91,7 +91,7 @@ export class TitleScene implements Scene {
 
   render(ctx: CanvasRenderingContext2D) {
     drawTitleScene(ctx, this.app, this.pair);
-    drawMenu(ctx, this.items(), this.sel, this.settings ? 'SETTINGS' : undefined);
+    drawMenu(ctx, this.items(), this.sel, this.settings ? 'SETTINGS' : undefined, this.settings ? [0] : []);
     drawTitlePlaque(ctx, !!this.app.touch);
   }
 }

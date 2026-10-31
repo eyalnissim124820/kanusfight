@@ -10,6 +10,7 @@ const DIR = '/ui/menu/';
 const load = (f: string) => { const i = new Image(); i.src = DIR + f; return i; };
 const plaqueDefault = load('plaque_default.png');
 const plaqueSelected = load('plaque_selected.png');
+const plaqueSelectedArrows = load('plaque_selected_arrows.png');
 const font = load('font.png');
 const ready = (i: HTMLImageElement) => i.complete && i.naturalWidth > 0;
 
@@ -20,9 +21,10 @@ const TRACKING = -1;
 const SPACE = 14;
 /** Screen scale of the plaque art and of full-size lettering. */
 export const MENU_SCALE = 0.5;
-/** Widest a label may be (atlas px) before it is shrunk to fit between the selected plaque's arrows.
- *  Applied in both states so a label keeps its size when highlighted. */
-const MAX_LABEL_W = 300;
+/** Widest a label may be (atlas px) before it is shrunk to fit inside the plaque. Options with arrows
+ *  get less room. The limit applies in both states so a label keeps its size when highlighted. */
+const MAX_LABEL_W = 350;
+const MAX_LABEL_W_ARROWS = 300;
 
 function measure(s: string): number {
   let w = 0;
@@ -42,9 +44,13 @@ export function bitmapText(ctx: CanvasRenderingContext2D, s: string, cx: number,
   }
 }
 
-/** One menu option centred on (cx, cy). Falls back to plain text until the art has loaded. */
-export function drawMenuButton(ctx: CanvasRenderingContext2D, label: string, cx: number, cy: number, selected: boolean) {
-  const plaque = selected ? plaqueSelected : plaqueDefault;
+/**
+ * One menu option centred on (cx, cy). `choices` marks an option that cycles with left/right
+ * (e.g. difficulty): only those show the gold arrows, and only while selected.
+ * Falls back to plain text until the art has loaded.
+ */
+export function drawMenuButton(ctx: CanvasRenderingContext2D, label: string, cx: number, cy: number, selected: boolean, choices = false) {
+  const plaque = !selected ? plaqueDefault : choices ? plaqueSelectedArrows : plaqueSelected;
   if (!ready(plaque) || !ready(font)) {
     text(ctx, label, cx, cy, 30, selected ? '#ff3b2f' : '#ffffff');
     return;
@@ -53,7 +59,7 @@ export function drawMenuButton(ctx: CanvasRenderingContext2D, label: string, cx:
   ctx.save();
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(plaque, Math.round(cx - (plaque.width * s) / 2), Math.round(cy - (plaque.height * s) / 2), plaque.width * s, plaque.height * s);
-  const fit = Math.min(1, MAX_LABEL_W / measure(label.toUpperCase()));
+  const fit = Math.min(1, (choices ? MAX_LABEL_W_ARROWS : MAX_LABEL_W) / measure(label.toUpperCase()));
   // The selected plaque carries a drop shadow on its left, so its face sits slightly right of centre.
   bitmapText(ctx, label, cx + (selected ? 3 : 0), cy, s * fit);
   ctx.restore();

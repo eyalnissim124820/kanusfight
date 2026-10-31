@@ -4,15 +4,13 @@ import { ROSTER } from '../characters';
 import { STAGES, drawStage, getStage, GROUND_Y } from '../render/stage';
 import { drawCharacter } from '../render/fighterView';
 import { text } from '../render/hud';
+import { drawTitleBackdrop, drawTitlePlaque } from '../render/titleBackdrop';
 import { FightScene } from './fight';
 import type { CharacterDef, MotionDir } from '../game/types';
 import type { Fighter } from '../game/fighter';
 import type { Difficulty } from '../game/ai';
 
 const DIFFS: Difficulty[] = ['easy', 'normal', 'hard'];
-
-const titleBg = new Image();
-titleBg.src = '/backgrounds/title.webp';
 
 
 function dim(ctx: CanvasRenderingContext2D, a: number) {
@@ -46,13 +44,7 @@ export class TitleScene implements Scene {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    if (titleBg.complete && titleBg.naturalWidth) {
-      // The artwork carries the logo and the "ENTER / J TO SELECT" plaque itself.
-      ctx.drawImage(titleBg, 0, 0, VIEW_W, VIEW_H);
-    } else {
-      ctx.fillStyle = '#2a1340'; ctx.fillRect(0, 0, VIEW_W, VIEW_H);
-      text(ctx, "KANU'S FIGHT", VIEW_W / 2, 110, 96, '#f2d06b', 'center', '#3a0a00');
-    }
+    drawTitleBackdrop(ctx, this.app.frame);
     // Soft panel behind the menu so it reads over the sea and balustrade.
     ctx.fillStyle = 'rgba(20,8,30,0.55)';
     ctx.beginPath();
@@ -62,12 +54,7 @@ export class TitleScene implements Scene {
       const label = i === 3 ? `DIFFICULTY: ${this.app.difficulty.toUpperCase()}` : s;
       text(ctx, label, VIEW_W / 2, 250 + i * 50, 32, i === this.sel ? '#ff3b2f' : '#ffffff');
     });
-    if (this.app.touch) {
-      // Cover the baked-in keyboard hint with the touch one.
-      ctx.fillStyle = '#3a1a10';
-      ctx.fillRect(VIEW_W / 2 - 150, 492, 300, 26);
-      text(ctx, 'STICK TO CHOOSE · HP OR LP TO SELECT', VIEW_W / 2, 505, 14, '#f2e2b8');
-    }
+    drawTitlePlaque(ctx, !!this.app.touch);
   }
 }
 

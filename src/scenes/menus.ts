@@ -199,8 +199,8 @@ export class SelectScene implements Scene {
 
   render(ctx: CanvasRenderingContext2D) {
     const f = this.app.frame;
-    drawStage(ctx, getStage(STAGES[this.stageIdx].id), 320, f);
-    dim(ctx, 0.55);
+    drawTitleBackdrop(ctx, f, { logo: false });
+    dim(ctx, 0.35);
     text(ctx, 'CHOOSE YOUR FIGHTER', VIEW_W / 2, 44, 52, '#f2d06b');
     const who = this.mode === '2p' ? '' : this.locked[0] ? 'PICK YOUR OPPONENT' : this.mode === 'cpu' ? 'PICK CPU 1' : 'PICK YOUR FIGHTER';
     if (who) text(ctx, who, VIEW_W / 2, 88, 22, '#ffffff');

@@ -114,14 +114,16 @@ function inBase(ctx: CanvasRenderingContext2D, draw: () => void) {
   ctx.restore();
 }
 
-export function drawTitleBackdrop(ctx: CanvasRenderingContext2D, frame: number) {
-  if (!CORE.every((k) => ready(images.get(k)))) {
-    if (ready(flat)) ctx.drawImage(flat, 0, 0, VIEW_W, VIEW_H);
+/** `logo: false` leaves out the title logo, for screens that put their own heading there. */
+export function drawTitleBackdrop(ctx: CanvasRenderingContext2D, frame: number, { logo = true } = {}) {
+  if (!CORE.every((k) => (!logo && k === 'logo') || ready(images.get(k)))) {
+    // The flat fallback has the logo baked in, so it only stands in when the logo is wanted.
+    if (logo && ready(flat)) ctx.drawImage(flat, 0, 0, VIEW_W, VIEW_H);
     else { ctx.fillStyle = '#2a1340'; ctx.fillRect(0, 0, VIEW_W, VIEW_H); }
     return;
   }
   const pan = Math.sin(frame * 0.003);
-  inBase(ctx, () => { for (const l of LAYERS) drawLayer(ctx, l, frame, pan); });
+  inBase(ctx, () => { for (const l of LAYERS) if (logo || l.file !== 'logo') drawLayer(ctx, l, frame, pan); });
 }
 
 /** The "ENTER / J TO SELECT" plaque, or a blank one carrying the touch hint. */

@@ -37,8 +37,8 @@ function paintedStage(id: string, name: string, file: string, groundY: number): 
   };
 }
 
-const livingRoom = paintedStage('living', 'Living Room', 'living_room.webp', 830);
-const greenRoom = paintedStage('green', 'Green Room', 'green_room.webp', 830);
+const livingRoom = paintedStage('living', 'Niv & Lele', 'living_room.webp', 830);
+const greenRoom = paintedStage('green', 'NADAV', 'green_room.webp', 830);
 
 /** The locations offered on the Choose Location screen. */
 export const STAGES: StageDef[] = [livingRoom, greenRoom];

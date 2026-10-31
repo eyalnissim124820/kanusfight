@@ -45,9 +45,9 @@ export class LoadingScene implements Scene {
     ctx.fillRect(0, 0, VIEW_W, VIEW_H);
     if (!ready(EMPTY) || !ready(FULL)) return; // the card itself is tiny; just a dark screen until then
 
-    // the card is 16:9 like the screen: fit it with a little margin and a gentle bob
+    // the card is 16:9 like the screen: fit it with a little margin, held still
     const w = VIEW_W * 0.96, h = w * (EMPTY.naturalHeight / EMPTY.naturalWidth);
-    const x = (VIEW_W - w) / 2, y = (VIEW_H - h) / 2 + Math.sin(this.t * 0.05) * 2;
+    const x = (VIEW_W - w) / 2, y = (VIEW_H - h) / 2;
     const p = this.fill();
     if (p >= 1 && this.t >= DURATION - READY_HOLD) {
       ctx.drawImage(FULL, x, y, w, h);

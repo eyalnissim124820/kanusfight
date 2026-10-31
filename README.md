@@ -18,7 +18,7 @@ npm run build      # type-check + production build into dist/
 ```
 
 Handy URLs:
-- `/?mode=cpu&p1=taldan&p2=ben&stage=moon&difficulty=hard`: jump straight into a fight (`mode` = `1p`, `2p` or `cpu`)
+- `/?mode=cpu&p1=taldan&p2=ben&stage=green&difficulty=hard`: jump straight into a fight (`mode` = `1p`, `2p` or `cpu`)
 - `/?tool=poses` (or `&char=taldan`): a sheet of every pose for every character. Press **D** to download it as a PNG.
 - In a fight: **F1** shows hitboxes and states, **Esc/P** pauses, **M** turns music on/off, **N** mutes.
 

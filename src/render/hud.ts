@@ -2,6 +2,12 @@ import type { Match, Particle, Projectile } from '../game/match';
 import { VIEW_W, VIEW_H, ROUNDS_TO_WIN } from '../game/match';
 import { GROUND_Y } from './stage';
 import { blitFrame, spriteImage } from './fighterView';
+import { trackImage } from '../core/assets';
+
+/** Pictures that replace a message's text (the text is still drawn if the picture hasn't loaded). */
+const MESSAGE_ART: Record<string, { img: HTMLImageElement; w: number }> = {
+  ko: { img: trackImage(Object.assign(new Image(), { src: '/ui/ko_logo.webp' })), w: 480 }, // KANUS 2000 logo instead of K.O.
+};
 
 export const FONT = '"Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif';
 
@@ -58,7 +64,11 @@ export function drawHud(ctx: CanvasRenderingContext2D, m: Match) {
     ctx.translate(VIEW_W / 2, VIEW_H * 0.38);
     const sc = 1.6 - 0.6 * k;
     ctx.scale(sc, sc);
-    text(ctx, msg.text, 0, 0, msg.size, msg.color, 'center', '#000');
+    const art = msg.image ? MESSAGE_ART[msg.image] : undefined;
+    if (art && art.img.complete && art.img.naturalWidth) {
+      const h = (art.w * art.img.naturalHeight) / art.img.naturalWidth;
+      ctx.drawImage(art.img, -art.w / 2, -h / 2, art.w, h);
+    } else text(ctx, msg.text, 0, 0, msg.size, msg.color, 'center', '#000');
     if (msg.sub) text(ctx, msg.sub, 0, msg.size * 0.85, msg.size * 0.55, '#ffffff');
     ctx.restore();
   }

@@ -20,7 +20,7 @@ export interface Particle {
   life: number; max: number; size: number; color: string; g: number; rot: number;
 }
 
-export interface Message { text: string; sub?: string; t: number; dur: number; color: string; size: number }
+export interface Message { text: string; sub?: string; t: number; dur: number; color: string; size: number; image?: string }
 
 export type MatchPhase = 'intro' | 'fight' | 'ko' | 'finish' | 'fatal' | 'timeup' | 'roundOver' | 'over';
 
@@ -116,8 +116,8 @@ export class Match {
 
   private setPhase(p: MatchPhase) { this.phase = p; this.phaseT = 0; }
 
-  message(text: string, dur: number, color = '#f2d06b', size = 64, sub?: string) {
-    this.messages.push({ text, sub, t: 0, dur, color, size });
+  message(text: string, dur: number, color = '#f2d06b', size = 64, sub?: string, image?: string) {
+    this.messages.push({ text, sub, t: 0, dur, color, size, image });
   }
 
   // ---------------- main tick ----------------
@@ -389,7 +389,7 @@ export class Match {
       }
       this.setPhase('ko');
       this.slowmo = 50;
-      this.message('K.O.', 90, '#ff3b2f', 110);
+      this.message('K.O.', 90, '#ff3b2f', 110, undefined, 'ko'); // shown as the KANUS 2000 logo
     }
     this.cb.sfx('hitHeavy');
   }

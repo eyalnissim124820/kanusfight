@@ -1,0 +1,300 @@
+{
+  "character": "Eyal",
+  "package_version": "1.0",
+  "purpose": "2D side-view fighting-game concept sprites",
+  "background_hex": "#00FF00",
+  "canvas_px": [
+    1024,
+    1024
+  ],
+  "facing": "RIGHT (designed; some poses may be partially three-quarter)",
+  "total_animations": 26,
+  "total_frames": 68,
+  "character_reference": {
+    "build": "tall and thin",
+    "hair": "bald",
+    "face": "full dark beard, round glasses",
+    "shirt": "oversized white tee featuring a black rectangular four-color flower print",
+    "pants": "loose dark charcoal jeans",
+    "shoes": "white high-top canvas sneakers",
+    "special_ability": "laptop meditation and forward lightning blast"
+  },
+  "animations": [
+    {
+      "id": "idle",
+      "frames": 4,
+      "description": "Fighting stance, slight breathing/bobbing, guard up.",
+      "ordered_images": [
+        "sprites/idle/idle_01.png",
+        "sprites/idle/idle_02.png",
+        "sprites/idle/idle_03.png",
+        "sprites/idle/idle_04.png"
+      ],
+      "suggested_fps": 8
+    },
+    {
+      "id": "walk",
+      "frames": 6,
+      "description": "Guarded walk forward; one complete step cycle.",
+      "ordered_images": [
+        "sprites/walk/walk_01.png",
+        "sprites/walk/walk_02.png",
+        "sprites/walk/walk_03.png",
+        "sprites/walk/walk_04.png",
+        "sprites/walk/walk_05.png",
+        "sprites/walk/walk_06.png"
+      ],
+      "suggested_fps": 10
+    },
+    {
+      "id": "crouch",
+      "frames": 1,
+      "description": "Deep crouch, leaning forward, guard up.",
+      "ordered_images": [
+        "sprites/crouch/crouch_01.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "jump",
+      "frames": 4,
+      "description": "Tucked jump/somersault through ascent, rotation and extension.",
+      "ordered_images": [
+        "sprites/jump/jump_01.png",
+        "sprites/jump/jump_02.png",
+        "sprites/jump/jump_03.png",
+        "sprites/jump/jump_04.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "block",
+      "frames": 1,
+      "description": "Standing defensive block with forearms raised to protect face.",
+      "ordered_images": [
+        "sprites/block/block_01.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "crouchBlock",
+      "frames": 1,
+      "description": "Crouched defensive block with forearms across face.",
+      "ordered_images": [
+        "sprites/crouchBlock/crouchBlock_01.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "lp",
+      "frames": 3,
+      "description": "Light punch: wind-up, straight jab, recovery.",
+      "ordered_images": [
+        "sprites/lp/lp_01.png",
+        "sprites/lp/lp_02.png",
+        "sprites/lp/lp_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "hp",
+      "frames": 3,
+      "description": "Heavy punch: rear-arm straight with torso rotation.",
+      "ordered_images": [
+        "sprites/hp/hp_01.png",
+        "sprites/hp/hp_02.png",
+        "sprites/hp/hp_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "lk",
+      "frames": 3,
+      "description": "Light kick: front kick at mid-body height.",
+      "ordered_images": [
+        "sprites/lk/lk_01.png",
+        "sprites/lk/lk_02.png",
+        "sprites/lk/lk_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "hk",
+      "frames": 3,
+      "description": "Heavy kick: high kick at head height.",
+      "ordered_images": [
+        "sprites/hk/hk_01.png",
+        "sprites/hk/hk_02.png",
+        "sprites/hk/hk_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "sweep",
+      "frames": 3,
+      "description": "Low sweeping kick along the ground.",
+      "ordered_images": [
+        "sprites/sweep/sweep_01.png",
+        "sprites/sweep/sweep_02.png",
+        "sprites/sweep/sweep_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "roundhouse",
+      "frames": 4,
+      "description": "Rotating roundhouse kick at head height.",
+      "ordered_images": [
+        "sprites/roundhouse/roundhouse_01.png",
+        "sprites/roundhouse/roundhouse_02.png",
+        "sprites/roundhouse/roundhouse_03.png",
+        "sprites/roundhouse/roundhouse_04.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "uppercut",
+      "frames": 3,
+      "description": "Crouch and explosive upward punch.",
+      "ordered_images": [
+        "sprites/uppercut/uppercut_01.png",
+        "sprites/uppercut/uppercut_02.png",
+        "sprites/uppercut/uppercut_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "crouchLk",
+      "frames": 2,
+      "description": "Crouched low poke kick.",
+      "ordered_images": [
+        "sprites/crouchLk/crouchLk_01.png",
+        "sprites/crouchLk/crouchLk_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "jumpKick",
+      "frames": 2,
+      "description": "Airborne diagonal flying kick.",
+      "ordered_images": [
+        "sprites/jumpKick/jumpKick_01.png",
+        "sprites/jumpKick/jumpKick_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "jumpPunch",
+      "frames": 2,
+      "description": "Airborne diagonal downward punch.",
+      "ordered_images": [
+        "sprites/jumpPunch/jumpPunch_01.png",
+        "sprites/jumpPunch/jumpPunch_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "throw",
+      "frames": 4,
+      "description": "Grab, lift, and overhead throw motion.",
+      "ordered_images": [
+        "sprites/throw/throw_01.png",
+        "sprites/throw/throw_02.png",
+        "sprites/throw/throw_03.png",
+        "sprites/throw/throw_04.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "hitHigh",
+      "frames": 2,
+      "description": "Recoil from a high hit, head and torso snapped backward.",
+      "ordered_images": [
+        "sprites/hitHigh/hitHigh_01.png",
+        "sprites/hitHigh/hitHigh_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "hitLow",
+      "frames": 2,
+      "description": "Doubling over from a torso hit.",
+      "ordered_images": [
+        "sprites/hitLow/hitLow_01.png",
+        "sprites/hitLow/hitLow_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "airHit",
+      "frames": 2,
+      "description": "Backward airborne knockback with limbs out.",
+      "ordered_images": [
+        "sprites/airHit/airHit_01.png",
+        "sprites/airHit/airHit_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "lying",
+      "frames": 1,
+      "description": "Lying flat on back.",
+      "ordered_images": [
+        "sprites/lying/lying_01.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "getup",
+      "frames": 2,
+      "description": "Getting up from floor to a knee and toward standing.",
+      "ordered_images": [
+        "sprites/getup/getup_01.png",
+        "sprites/getup/getup_02.png"
+      ],
+      "suggested_fps": 10
+    },
+    {
+      "id": "dizzy",
+      "frames": 3,
+      "description": "Standing and wobbling, head drooping.",
+      "ordered_images": [
+        "sprites/dizzy/dizzy_01.png",
+        "sprites/dizzy/dizzy_02.png",
+        "sprites/dizzy/dizzy_03.png"
+      ],
+      "suggested_fps": 8
+    },
+    {
+      "id": "victory",
+      "frames": 2,
+      "description": "Celebratory flex / raised fist.",
+      "ordered_images": [
+        "sprites/victory/victory_01.png",
+        "sprites/victory/victory_02.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "laptopMeditation",
+      "frames": 3,
+      "description": "Special: draws a silver laptop, sits in meditation and fires blue-white lightning forward.",
+      "ordered_images": [
+        "sprites/laptopMeditation/laptopMeditation_01.png",
+        "sprites/laptopMeditation/laptopMeditation_02.png",
+        "sprites/laptopMeditation/laptopMeditation_03.png"
+      ],
+      "suggested_fps": 12
+    },
+    {
+      "id": "finisher",
+      "frames": 2,
+      "description": "Powered finishing attack with blue-white electric energy.",
+      "ordered_images": [
+        "sprites/finisher/finisher_01.png",
+        "sprites/finisher/finisher_02.png"
+      ],
+      "suggested_fps": 12
+    }
+  ]
+}

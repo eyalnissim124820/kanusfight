@@ -100,6 +100,9 @@ Press **F1** in a fight to see them.
    ```bash
    python3 tools/pack_frames.py art/ben/sprites public/sprites/ben.webp src/characters/sprites/ben.json --scale 0.36 --pivot 512,996
    ```
+   If the frames **don't** share a placement (e.g. some were cropped and enlarged from other sheets, like
+   Eyal's pack), add `--config art/<name>/frames.json`: each frame is then anchored on its own feet and trunk,
+   and `size` shrinks enlarged animations (or single frames) back to idle's scale. See `art/eyal/frames.json`.
 4. **Character file.** Copy `src/characters/taldan.ts` (or `ben.ts`), import the new atlas JSON, and add the character to `ROSTER`.
 
 The `sprites` block in a character file:

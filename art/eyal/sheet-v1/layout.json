@@ -1,8 +1,8 @@
 {
  "source": "source-sheet.png",
  "output": {
-  "image": "../../public/sprites/eyal.webp",
-  "atlas": "../../src/characters/sprites/eyal.json"
+  "image": "../../../public/sprites/eyal.webp",
+  "atlas": "../../../src/characters/sprites/eyal.json"
  },
  "bands": [
   [

@@ -5,8 +5,11 @@ import atlas from './sprites/eyal.json';
 
 /**
  * EYAL PRO MAX — balanced all-rounder with a laptop full of lightning.
- * Art: art/eyal/source-sheet.png, cut by tools/extract_sprites.py (layout in art/eyal/layout.json)
- * into public/sprites/eyal.webp. The lightning bolt projectile is cut from the same sheet.
+ * Art: the frame pack in art/eyal/sprites (one PNG per frame), packed by tools/pack_frames.py with
+ * art/eyal/frames.json, which evens out the frames' different scales, into public/sprites/eyal.webp:
+ *   python3 tools/pack_frames.py art/eyal/sprites public/sprites/eyal.webp src/characters/sprites/eyal.json \
+ *     --scale 0.3 --config art/eyal/frames.json --anchor proj_hotDeploy=0.5,0.5
+ * The lightning bolt projectile comes from the first sheet (art/eyal/sheet-v1).
  */
 export const eyal: CharacterDef = {
   id: 'eyal',
@@ -39,7 +42,7 @@ export const eyal: CharacterDef = {
         projectile: {
           speed: 8, w: 70, h: 44, y: 52, x: 96, damage: 10, chip: 2, hitstun: 24,
           knockback: { x: 7, y: 0 }, life: 160, style: 'bolt', color: '#e6fbff', glow: '#2ecbff',
-          sprite: 'proj_hotDeploy', // the laptop lightning cut from art/eyal/source-sheet.png
+          sprite: 'proj_hotDeploy', // the laptop lightning, from art/eyal/sheet-v1
         },
         poses: {
           windup: P({ ...LEGS.crouch, torso: 10, fs: 60, fe: 60, bs: 50, be: 70 }),
@@ -76,15 +79,16 @@ export const eyal: CharacterDef = {
       idle: { fps: 7 }, walk: { fps: 10 }, dizzy: { fps: 5 },
       jump: { fps: 6, loop: false }, victory: { fps: 3, loop: false }, getup: { fps: 6 },
       hitHigh: { fps: 12 }, hitLow: { fps: 12 }, airHit: { fps: 8 },
+      finisher: { fps: 4, loop: false }, // lightning punch, then the power pose
       lp: { hit: 1 }, hp: { hit: 1 }, lk: { hit: 1 }, hk: { hit: 1 },
-      sweep: { hit: 2 }, roundhouse: { hit: 3 }, uppercut: { hit: 2 },
-      crouchLk: { frames: [1, 0], hit: 1 }, jumpKick: { frames: [1, 0], hit: 1 }, jumpPunch: { hit: 1 },
-      hotDeploy: { hit: 2 },
+      sweep: { hit: 1 }, roundhouse: { hit: 2 }, uppercut: { hit: 1 },
+      crouchLk: { frames: [1, 0], hit: 1 }, jumpKick: { hit: 1 }, jumpPunch: { hit: 1 },
+      hotDeploy: { hit: 2 }, // stand with the laptop, sit and charge, release the bolt
       closeHp: { use: 'hp', hit: 1 },
       closeHk: { use: 'lk', hit: 1 },
       crouchLp: { use: 'crouchLk', frames: [1, 0], hit: 1 },
       crouchHk: { use: 'crouchLk', frames: [1, 0], hit: 1 },
-      jumpUpKick: { use: 'jumpKick', frames: [1, 0], hit: 1 },
+      jumpUpKick: { use: 'jumpKick', hit: 1 },
       throw: { frames: [0, 1], hit: 1 },
       throwing: { use: 'throw', frames: [2, 3], fps: 3, loop: false },
       thrown: { use: 'airHit', fps: 6 },

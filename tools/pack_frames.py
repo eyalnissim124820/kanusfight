@@ -15,6 +15,14 @@ placement: the pivot is the floor point under the fighter, the same for all fram
 --anchor name=fx,fy overrides the pivot for one animation with a point inside its trimmed frame
 (fractions of width/height) — e.g. projectiles, anchored on their head.
 
+--config frames.json is for packs whose frames do NOT share a placement (e.g. poses cropped and enlarged
+from different sheets). Each frame is then anchored on itself: x = its trunk (densest column), y = its
+lowest pixel (or the box centre for airborne animations). Keys (all optional):
+  "size":   {anim or frame file stem: s} – how big the character is drawn in that animation relative to idle (1.3 = 30%
+                         larger); the frames are shrunk by 1/s so every animation matches
+  "center": [anim, …]  – anchor on the bounding-box centre (jumps, air hits)
+  "fadeRight": {anim: px} – soften an effect cut off by the right image edge
+
 Output: a trimmed, shelf-packed WebP atlas plus JSON with [x, y, w, h, anchorX, anchorY] per frame,
 the same format extract_sprites.py writes.
 """
@@ -30,7 +38,9 @@ ap.add_argument('out_json')
 ap.add_argument('--scale', type=float, default=0.36)
 ap.add_argument('--pivot', default='512,996')
 ap.add_argument('--anchor', action='append', default=[])
+ap.add_argument('--config')
 args = ap.parse_args()
+CFG = json.load(open(args.config)) if args.config else None
 PX, PY = (float(v) for v in args.pivot.split(','))
 ANCHORS = {a.split('=')[0]: tuple(float(v) for v in a.split('=')[1].split(',')) for a in args.anchor}
 
@@ -62,13 +72,28 @@ for d in sorted(os.listdir(args.frames_dir)):
         if not bb:
             continue
         crop = im.crop(bb)
-        w, h = round(crop.width * args.scale), round(crop.height * args.scale)
-        crop = crop.resize((max(1, w), max(1, h)), Image.LANCZOS)
+        stem = os.path.splitext(os.path.basename(f))[0]  # a frame (e.g. sweep_01) can override its animation
+        sc = args.scale / (CFG.get('size', {}).get(stem, CFG.get('size', {}).get(d, 1.0)) if CFG else 1.0)
+        fr = CFG.get('fadeRight', {}).get(d) if CFG else None
+        if fr:
+            a = np.asarray(crop).copy()
+            ramp = np.clip((crop.width - 1 - np.arange(crop.width)) / fr, 0, 1)
+            a[..., 3] = (a[..., 3] * ramp[None, :]).astype(np.uint8)
+            crop = Image.fromarray(a, 'RGBA')
+        w, h = round(crop.width * sc), round(crop.height * sc)
         if d in ANCHORS:
             ax, ay = ANCHORS[d][0] * w, ANCHORS[d][1] * h
+        elif CFG is not None:
+            alpha = np.asarray(crop)[..., 3] > 128
+            if d in CFG.get('center', []):
+                ax, ay = crop.width / 2, crop.height / 2
+            else:  # the densest column is the trunk: a stable anchor while limbs move
+                ax, ay = float(np.argmax(np.convolve(alpha.sum(0).astype(float), np.ones(41) / 41, 'same'))), crop.height
+            ax, ay = ax * sc, ay * sc
         else:
-            ax, ay = (PX - bb[0]) * args.scale, (PY - bb[1]) * args.scale
-        frames.append((d, i, crop, ax, ay, (bb[3] - bb[1]) * args.scale))
+            ax, ay = (PX - bb[0]) * sc, (PY - bb[1]) * sc
+        crop = crop.resize((max(1, w), max(1, h)), Image.LANCZOS)
+        frames.append((d, i, crop, ax, ay, (bb[3] - bb[1]) * sc))
 
 SHEET_W, GAP = 2048, 2
 x = y = shelf = 0

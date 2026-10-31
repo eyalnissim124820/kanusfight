@@ -1,0 +1,69 @@
+animation,frame,filename,description
+idle,1,sprites/idle/idle_01.png,"Fighting stance, slight breathing/bobbing, guard up."
+idle,2,sprites/idle/idle_02.png,"Fighting stance, slight breathing/bobbing, guard up."
+idle,3,sprites/idle/idle_03.png,"Fighting stance, slight breathing/bobbing, guard up."
+idle,4,sprites/idle/idle_04.png,"Fighting stance, slight breathing/bobbing, guard up."
+walk,1,sprites/walk/walk_01.png,Guarded walk forward; one complete step cycle.
+walk,2,sprites/walk/walk_02.png,Guarded walk forward; one complete step cycle.
+walk,3,sprites/walk/walk_03.png,Guarded walk forward; one complete step cycle.
+walk,4,sprites/walk/walk_04.png,Guarded walk forward; one complete step cycle.
+walk,5,sprites/walk/walk_05.png,Guarded walk forward; one complete step cycle.
+walk,6,sprites/walk/walk_06.png,Guarded walk forward; one complete step cycle.
+crouch,1,sprites/crouch/crouch_01.png,"Deep crouch, leaning forward, guard up."
+jump,1,sprites/jump/jump_01.png,"Tucked jump/somersault through ascent, rotation and extension."
+jump,2,sprites/jump/jump_02.png,"Tucked jump/somersault through ascent, rotation and extension."
+jump,3,sprites/jump/jump_03.png,"Tucked jump/somersault through ascent, rotation and extension."
+jump,4,sprites/jump/jump_04.png,"Tucked jump/somersault through ascent, rotation and extension."
+block,1,sprites/block/block_01.png,Standing defensive block with forearms raised to protect face.
+crouchBlock,1,sprites/crouchBlock/crouchBlock_01.png,Crouched defensive block with forearms across face.
+lp,1,sprites/lp/lp_01.png,"Light punch: wind-up, straight jab, recovery."
+lp,2,sprites/lp/lp_02.png,"Light punch: wind-up, straight jab, recovery."
+lp,3,sprites/lp/lp_03.png,"Light punch: wind-up, straight jab, recovery."
+hp,1,sprites/hp/hp_01.png,Heavy punch: rear-arm straight with torso rotation.
+hp,2,sprites/hp/hp_02.png,Heavy punch: rear-arm straight with torso rotation.
+hp,3,sprites/hp/hp_03.png,Heavy punch: rear-arm straight with torso rotation.
+lk,1,sprites/lk/lk_01.png,Light kick: front kick at mid-body height.
+lk,2,sprites/lk/lk_02.png,Light kick: front kick at mid-body height.
+lk,3,sprites/lk/lk_03.png,Light kick: front kick at mid-body height.
+hk,1,sprites/hk/hk_01.png,Heavy kick: high kick at head height.
+hk,2,sprites/hk/hk_02.png,Heavy kick: high kick at head height.
+hk,3,sprites/hk/hk_03.png,Heavy kick: high kick at head height.
+sweep,1,sprites/sweep/sweep_01.png,Low sweeping kick along the ground.
+sweep,2,sprites/sweep/sweep_02.png,Low sweeping kick along the ground.
+sweep,3,sprites/sweep/sweep_03.png,Low sweeping kick along the ground.
+roundhouse,1,sprites/roundhouse/roundhouse_01.png,Rotating roundhouse kick at head height.
+roundhouse,2,sprites/roundhouse/roundhouse_02.png,Rotating roundhouse kick at head height.
+roundhouse,3,sprites/roundhouse/roundhouse_03.png,Rotating roundhouse kick at head height.
+roundhouse,4,sprites/roundhouse/roundhouse_04.png,Rotating roundhouse kick at head height.
+uppercut,1,sprites/uppercut/uppercut_01.png,Crouch and explosive upward punch.
+uppercut,2,sprites/uppercut/uppercut_02.png,Crouch and explosive upward punch.
+uppercut,3,sprites/uppercut/uppercut_03.png,Crouch and explosive upward punch.
+crouchLk,1,sprites/crouchLk/crouchLk_01.png,Crouched low poke kick.
+crouchLk,2,sprites/crouchLk/crouchLk_02.png,Crouched low poke kick.
+jumpKick,1,sprites/jumpKick/jumpKick_01.png,Airborne diagonal flying kick.
+jumpKick,2,sprites/jumpKick/jumpKick_02.png,Airborne diagonal flying kick.
+jumpPunch,1,sprites/jumpPunch/jumpPunch_01.png,Airborne diagonal downward punch.
+jumpPunch,2,sprites/jumpPunch/jumpPunch_02.png,Airborne diagonal downward punch.
+throw,1,sprites/throw/throw_01.png,"Grab, lift, and overhead throw motion."
+throw,2,sprites/throw/throw_02.png,"Grab, lift, and overhead throw motion."
+throw,3,sprites/throw/throw_03.png,"Grab, lift, and overhead throw motion."
+throw,4,sprites/throw/throw_04.png,"Grab, lift, and overhead throw motion."
+hitHigh,1,sprites/hitHigh/hitHigh_01.png,"Recoil from a high hit, head and torso snapped backward."
+hitHigh,2,sprites/hitHigh/hitHigh_02.png,"Recoil from a high hit, head and torso snapped backward."
+hitLow,1,sprites/hitLow/hitLow_01.png,Doubling over from a torso hit.
+hitLow,2,sprites/hitLow/hitLow_02.png,Doubling over from a torso hit.
+airHit,1,sprites/airHit/airHit_01.png,Backward airborne knockback with limbs out.
+airHit,2,sprites/airHit/airHit_02.png,Backward airborne knockback with limbs out.
+lying,1,sprites/lying/lying_01.png,Lying flat on back.
+getup,1,sprites/getup/getup_01.png,Getting up from floor to a knee and toward standing.
+getup,2,sprites/getup/getup_02.png,Getting up from floor to a knee and toward standing.
+dizzy,1,sprites/dizzy/dizzy_01.png,"Standing and wobbling, head drooping."
+dizzy,2,sprites/dizzy/dizzy_02.png,"Standing and wobbling, head drooping."
+dizzy,3,sprites/dizzy/dizzy_03.png,"Standing and wobbling, head drooping."
+victory,1,sprites/victory/victory_01.png,Celebratory flex / raised fist.
+victory,2,sprites/victory/victory_02.png,Celebratory flex / raised fist.
+laptopMeditation,1,sprites/laptopMeditation/laptopMeditation_01.png,"Special: draws a silver laptop, sits in meditation and fires blue-white lightning forward."
+laptopMeditation,2,sprites/laptopMeditation/laptopMeditation_02.png,"Special: draws a silver laptop, sits in meditation and fires blue-white lightning forward."
+laptopMeditation,3,sprites/laptopMeditation/laptopMeditation_03.png,"Special: draws a silver laptop, sits in meditation and fires blue-white lightning forward."
+finisher,1,sprites/finisher/finisher_01.png,Powered finishing attack with blue-white electric energy.
+finisher,2,sprites/finisher/finisher_02.png,Powered finishing attack with blue-white electric energy.

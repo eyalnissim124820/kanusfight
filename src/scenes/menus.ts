@@ -10,6 +10,7 @@ import { FightScene } from './fight';
 import type { CharacterDef, MotionDir } from '../game/types';
 import type { Fighter } from '../game/fighter';
 import type { Difficulty } from '../game/ai';
+import { LoadingScene } from './loading';
 
 const DIFFS: Difficulty[] = ['easy', 'normal', 'hard'];
 
@@ -266,7 +267,8 @@ export class LocationScene implements Scene {
     } else if (input.confirm()) {
       audio.play('confirm');
       const [a, b] = this.pair;
-      this.app.setScene(createFight(this.app, this.mode, ROSTER[a], ROSTER[b], STAGES[this.idx].id));
+      const stage = STAGES[this.idx].id, mode = this.mode;
+      this.app.setScene(new LoadingScene(this.app, () => createFight(this.app, mode, ROSTER[a], ROSTER[b], stage)));
     }
   }
 

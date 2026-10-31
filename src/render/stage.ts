@@ -1,4 +1,5 @@
 import { STAGE_W, VIEW_W, VIEW_H } from '../game/match';
+import { trackImage } from '../core/assets';
 
 export const GROUND_Y = 478; // screen y of the floor line
 
@@ -22,6 +23,7 @@ const PAINTED_PARALLAX = 0.25;
 function paintedStage(id: string, name: string, file: string, groundY: number): StageDef {
   const img = new Image();
   img.src = `/backgrounds/stages/${file}`;
+  trackImage(img);
   return {
     id, name,
     build: () => ({

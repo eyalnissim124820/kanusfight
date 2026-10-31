@@ -1,5 +1,6 @@
 import { text } from './hud';
 import glyphs from './menuFont.json';
+import { trackImage } from '../core/assets';
 
 /**
  * Menu buttons: burgundy plaques (red with gold arrows when selected) labelled in the KANUS bitmap
@@ -7,7 +8,7 @@ import glyphs from './menuFont.json';
  */
 
 const DIR = '/ui/menu/';
-const load = (f: string) => { const i = new Image(); i.src = DIR + f; return i; };
+const load = (f: string) => { const i = new Image(); i.src = DIR + f; return trackImage(i); };
 const plaqueDefault = load('plaque_default.png');
 const plaqueSelected = load('plaque_selected.png');
 const plaqueSelectedArrows = load('plaque_selected_arrows.png');

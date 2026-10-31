@@ -2,6 +2,7 @@ import { Input } from './core/input';
 import { Audio } from './core/audio';
 import type { App, Mode, Scene } from './scenes/scene';
 import { TitleScene, createFight } from './scenes/menus';
+import { LoadingScene } from './scenes/loading';
 import { getCharacter, ROSTER } from './characters';
 import { spriteImage } from './render/fighterView';
 import { VIEW_W, VIEW_H } from './game/match';
@@ -63,7 +64,7 @@ function startGame() {
   if (q.get('mode')) {
     scene = createFight(app, q.get('mode') as Mode, getCharacter(q.get('p1') ?? 'taldan'),
       getCharacter(q.get('p2') ?? 'ben'), q.get('stage') ?? 'living');
-  } else scene = new TitleScene(app);
+  } else scene = new LoadingScene(app, () => new TitleScene(app)); // art loads behind the loading card
   app.touch?.setInFight('match' in scene);
 
   // Fixed 60Hz simulation, decoupled from the display refresh rate.

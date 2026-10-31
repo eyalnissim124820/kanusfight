@@ -1,5 +1,6 @@
 import { VIEW_W, VIEW_H } from '../game/match';
 import { text } from './hud';
+import { trackImage } from '../core/assets';
 
 /**
  * Layered, animated title-screen backdrop.
@@ -67,10 +68,12 @@ const images = new Map<string, HTMLImageElement>();
 for (const l of [...LAYERS, PLAQUE_KEYS, PLAQUE_BLANK]) {
   const img = new Image();
   img.src = `${DIR}${l.file}.png`;
+  trackImage(img);
   images.set(l.file, img);
 }
 const flat = new Image();
 flat.src = '/backgrounds/title.webp';
+trackImage(flat);
 
 const ready = (img: HTMLImageElement | undefined): img is HTMLImageElement => !!img && img.complete && img.naturalWidth > 0;
 

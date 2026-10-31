@@ -3,6 +3,7 @@ import type { BasePoseKey, CharacterDef, Pose, SpriteAnim, SpriteFrame, SpriteSh
 import { characterHeight } from '../game/fighter';
 import { BASE_POSES, lerpPose, easeOut } from './poses';
 import { drawSkeleton, type DrawOpts } from './skeleton';
+import { trackImage } from '../core/assets';
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -114,7 +115,7 @@ const spriteCache = new Map<string, HTMLImageElement>();
 /** Returns the loaded image, or null while it is still loading (the skeleton is drawn meanwhile). */
 export function spriteImage(src: string) {
   let img = spriteCache.get(src);
-  if (!img) { img = new Image(); img.src = src; spriteCache.set(src, img); }
+  if (!img) { img = new Image(); img.src = src; spriteCache.set(src, img); trackImage(img); }
   return img.complete && img.naturalWidth ? img : null;
 }
 

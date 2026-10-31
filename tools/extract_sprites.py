@@ -13,6 +13,7 @@ layout.json describes where each animation sits on the source sheet:
                        maxReach px   – per-animation reach crop (overrides the global one)
                        anchor 'center' – anchor on the bounding-box centre (projectiles)
                        fadeLeft / fadeRight px – soften an effect cut off by the cell edge
+                       give [[frame, x0, y0, x1, y1], …] – where poses overlap, hand that box (sheet px) to one frame
   thinLines – true: erase 1–2px lines (cell borders) before finding frames
   centerAnchor – animations anchored on their bounding-box centre (airborne / lying poses)
   maxReach  – crop effects that reach further forward than this (source px)
@@ -81,7 +82,6 @@ def frames_for(anim, band, sec, n, opts=None):
             right[:, :cut] = False
             masks[wi:wi] = [left, right]
     assert len(masks) == n, f'{anim}: found {len(masks)} frames, expected {n}'
-
     # a frame's limb that pokes into the next frame belongs to it, not to the neighbour
     for i in range(1, len(masks)):
         A, B = masks[i - 1], masks[i]
@@ -94,8 +94,26 @@ def frames_for(anim, band, sec, n, opts=None):
         stray[int(brows[0] + 0.55 * (brows[-1] - brows[0])):, :] = False  # arms only, never feet
         scols = np.nonzero(stray.any(0))[0]
         if stray.sum() > 40 and len(scols) and scols[0] - acols[-1] < 12 and acols[-1] >= body - 60:
-            B[stray] = False
-            A[stray] = True
+            # only pieces that actually touch the previous frame move over (not B's own back edge)
+            sl, sk = ndimage.label(stray)
+            nearA = ndimage.binary_dilation(A, iterations=3)
+            for j in range(1, sk + 1):
+                piece = sl == j
+                if (piece & nearA).any():
+                    B[piece] = False
+                    A[piece] = True
+
+    # manual fixes where poses overlap: give [frame, x0, y0, x1, y1] (sheet px) hands that box to a frame
+    for gi, gx0, gy0, gx1, gy1 in opts.get('give', []):
+        box = np.zeros_like(masks[0])
+        box[max(0, gy0 - y0):gy1 - y0, max(0, gx0 - x0):gx1 - x0] = True
+        allm = np.zeros_like(box)
+        for mm in masks:
+            allm |= mm
+        for j, mm in enumerate(masks):
+            if j != gi:
+                mm &= ~box
+        masks[gi] |= allm & box
 
     # small fragments (glints, sparks) join the nearest frame; border lines are dropped
     for c in comps:
@@ -115,6 +133,7 @@ def frames_for(anim, band, sec, n, opts=None):
 
     res = []
     for i, m in enumerate(masks):
+        orig = m
         m = ndimage.binary_opening(m, structure=np.ones((5, 5)))
         l3, k3 = ndimage.label(m)
         if k3 > 1:  # drop specks that float away from the main body
@@ -127,6 +146,8 @@ def frames_for(anim, band, sec, n, opts=None):
                 if sizes[j] >= 0.12 * sizes.max() or (piece & near).any():
                     keep |= piece
             m = keep
+        # the opening cuts thin wrists/ankles: grow back through the original pixels so fists and toes stay
+        m = ndimage.binary_dilation(m, iterations=30, mask=orig) | m
         m = ndimage.binary_dilation(m, iterations=1) & ~(dark[y0:y1, x0:x1] & (lab == 0))
         ys, xs = np.nonzero(m)
         fy0, fy1, fx0, fx1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1

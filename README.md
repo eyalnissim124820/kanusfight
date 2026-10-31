@@ -55,6 +55,7 @@ Directions are relative to facing (→ = toward the opponent).
 | **TALDAN** (heavy, sprite art) | Power Blast ← → LP · Riot Rush → → HP | Final Verdict → ↓ → HP (any range) |
 | **BEN** (quick, sprite art) | Flying Shears ← → LP · Denim Lance ← → HK | Perfect Cut → ↓ → LK (close) |
 | **EYAL PRO MAX** (balanced, sprite art) | Hot Deploy ← → LP · Hotfix Rush → → HP | Ship It → ↓ → HP (any range) |
+| **KLEIN** (brawler, sprite art) | Guitar Smash ← → HP · Power Chord ↓ → LP | Encore → ↓ → HP (close) |
 | **NYX** (fast) | Moon Blade ← → HP · Shadow Step ↓ ← LP · Crescent Rise ↓ → HK · Talon Dive (air) ↓ HK | Eclipse → ← → LK (any range) |
 
 The finisher works in the deciding round: when the loser is stunned and **END IT!** appears.

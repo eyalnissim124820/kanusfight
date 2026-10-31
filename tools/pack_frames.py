@@ -47,8 +47,8 @@ ANCHORS = {a.split('=')[0]: tuple(float(v) for v in a.split('=')[1].split(',')) 
 
 def keyed(path):
     im = Image.open(path)
-    if im.mode == 'RGBA':
-        return im
+    if im.mode == 'RGBA' and im.getchannel('A').getextrema()[0] < 255:
+        return im  # already transparent (an opaque RGBA frame on green is keyed below)
     a = np.asarray(im.convert('RGB')).astype(np.int32)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
     k = g - np.maximum(r, b)
@@ -58,6 +58,10 @@ def keyed(path):
     if n:
         sizes = ndimage.sum(solid, lab, range(1, n + 1))
         alpha[np.isin(lab, 1 + np.nonzero(sizes < 60)[0])] = 0  # specks
+        # 1–2px lines (cell borders left over from a sheet): pieces with no thick part at all
+        thick = ndimage.binary_opening(solid, structure=np.ones((5, 5)))
+        has_thick = ndimage.maximum(thick, lab, range(1, n + 1))
+        alpha[np.isin(lab, 1 + np.nonzero(~has_thick.astype(bool))[0])] = 0
     mx = np.maximum(r, b)
     g2 = np.where(g > mx, (mx * 0.7 + g * 0.3).astype(np.int32), g)  # despill green fringes
     return Image.fromarray(np.dstack([r, g2, b, (alpha * 255).astype(np.int32)]).astype(np.uint8), 'RGBA')

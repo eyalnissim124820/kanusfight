@@ -1,0 +1,290 @@
+{
+  "character": "Klein",
+  "frame_size": [
+    1024,
+    1024
+  ],
+  "sheets": {
+    "sheet_01_idle_walk": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_clean_crisp_sprite_sheet_game_asset_sheet_wit_1_batch_1.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "idle_01",
+        "idle_02",
+        "idle_03",
+        "idle_04",
+        "walk_01",
+        "walk_02",
+        "walk_03",
+        "walk_04",
+        "walk_05",
+        "walk_06"
+      ]
+    },
+    "sheet_02_crouch_jump_block_lp": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_crisp_highly_detailed_comic_book_comic_game_s_2_batch_2.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "crouch_01",
+        "jump_01",
+        "jump_02",
+        "jump_03",
+        "jump_04",
+        "block_01",
+        "crouchBlock_01",
+        "lp_01",
+        "lp_02",
+        "lp_03"
+      ]
+    },
+    "sheet_03_hp_lk_hk": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_crisp_high_detail_sprite_sheet_style_illustrati_3_batch_3.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "hp_01",
+        "hp_02",
+        "hp_03",
+        "lk_01",
+        "lk_02",
+        "lk_03",
+        "hk_01",
+        "hk_02",
+        "hk_03"
+      ]
+    },
+    "sheet_04_sweep_roundhouse_uppercut": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_clean_high_detail_game_asset_sprite_sheet_a_si_4_batch_4.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "sweep_01",
+        "sweep_02",
+        "sweep_03",
+        "roundhouse_01",
+        "roundhouse_02",
+        "roundhouse_03",
+        "roundhouse_04",
+        "uppercut_01",
+        "uppercut_02",
+        "uppercut_03"
+      ]
+    },
+    "sheet_05_crouchlk_jump_throw": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_clean_high_detail_game_asset_sprite_sheet_in_a_5_batch_5.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "crouchLk_01",
+        "crouchLk_02",
+        "jumpKick_01",
+        "jumpKick_02",
+        "jumpPunch_01",
+        "jumpPunch_02",
+        "throw_01",
+        "throw_02",
+        "throw_03",
+        "throw_04"
+      ]
+    },
+    "sheet_06_hit_lying_getup": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_clean_comic_book_high_detail_digital_illustrati_6_batch_6.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "hitHigh_01",
+        "hitHigh_02",
+        "hitLow_01",
+        "hitLow_02",
+        "airHit_01",
+        "airHit_02",
+        "lying_01",
+        "getup_01",
+        "getup_02"
+      ]
+    },
+    "sheet_07_dizzy_victory_special_finisher": {
+      "source": "/mnt/data/ghostwriter_images/generated/a_clean_high_detail_comic_book_video_game_sprite_7_batch_7.png",
+      "size": [
+        1983,
+        793
+      ],
+      "grid": [
+        5,
+        2
+      ],
+      "frames": [
+        "dizzy_01",
+        "dizzy_02",
+        "dizzy_03",
+        "victory_01",
+        "victory_02",
+        "special_guitarSmash_01",
+        "special_guitarSmash_02",
+        "special_guitarSmash_03",
+        "finisher_01",
+        "finisher_02"
+      ]
+    }
+  },
+  "animations": {
+    "airHit": [
+      "airHit_01",
+      "airHit_02"
+    ],
+    "block": [
+      "block_01"
+    ],
+    "crouch": [
+      "crouch_01"
+    ],
+    "crouchBlock": [
+      "crouchBlock_01"
+    ],
+    "crouchLk": [
+      "crouchLk_01",
+      "crouchLk_02"
+    ],
+    "dizzy": [
+      "dizzy_01",
+      "dizzy_02",
+      "dizzy_03"
+    ],
+    "finisher": [
+      "finisher_01",
+      "finisher_02"
+    ],
+    "getup": [
+      "getup_01",
+      "getup_02"
+    ],
+    "hitHigh": [
+      "hitHigh_01",
+      "hitHigh_02"
+    ],
+    "hitLow": [
+      "hitLow_01",
+      "hitLow_02"
+    ],
+    "hk": [
+      "hk_01",
+      "hk_02",
+      "hk_03"
+    ],
+    "hp": [
+      "hp_01",
+      "hp_02",
+      "hp_03"
+    ],
+    "idle": [
+      "idle_01",
+      "idle_02",
+      "idle_03",
+      "idle_04"
+    ],
+    "jump": [
+      "jump_01",
+      "jump_02",
+      "jump_03",
+      "jump_04"
+    ],
+    "jumpKick": [
+      "jumpKick_01",
+      "jumpKick_02"
+    ],
+    "jumpPunch": [
+      "jumpPunch_01",
+      "jumpPunch_02"
+    ],
+    "lk": [
+      "lk_01",
+      "lk_02",
+      "lk_03"
+    ],
+    "lp": [
+      "lp_01",
+      "lp_02",
+      "lp_03"
+    ],
+    "lying": [
+      "lying_01"
+    ],
+    "roundhouse": [
+      "roundhouse_01",
+      "roundhouse_02",
+      "roundhouse_03",
+      "roundhouse_04"
+    ],
+    "special_guitarSmash": [
+      "special_guitarSmash_01",
+      "special_guitarSmash_02",
+      "special_guitarSmash_03"
+    ],
+    "sweep": [
+      "sweep_01",
+      "sweep_02",
+      "sweep_03"
+    ],
+    "throw": [
+      "throw_01",
+      "throw_02",
+      "throw_03",
+      "throw_04"
+    ],
+    "uppercut": [
+      "uppercut_01",
+      "uppercut_02",
+      "uppercut_03"
+    ],
+    "victory": [
+      "victory_01",
+      "victory_02"
+    ],
+    "walk": [
+      "walk_01",
+      "walk_02",
+      "walk_03",
+      "walk_04",
+      "walk_05",
+      "walk_06"
+    ]
+  }
+}

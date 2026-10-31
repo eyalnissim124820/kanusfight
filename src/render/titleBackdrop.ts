@@ -16,7 +16,7 @@ const MAX_SHIFT = 400;
 
 type Anim =
   | { type: 'sway'; deg: number; speed: number; phase: number } // rotate around the anchor
-  | { type: 'pulse'; speed: number } // sun glow: alpha 0.9-1.0 and scale 1.0-1.03
+  | { type: 'pulse'; speed: number } // sun glow: alpha 0.9-1.0, size fixed
   | { type: 'bob'; px: number; speed: number } // vertical bob
   | { type: 'frames'; count: number; every: number }; // horizontal sprite strip
 
@@ -36,14 +36,15 @@ interface Layer {
 }
 
 const LAYERS: Layer[] = [
+  // The sun, its reflection and the town are locked in place; the rest of the scene pans around them.
   { file: 'sky', z: 0, x: 960, y: 0, anchor: [0.5, 0], parallax: 0.05 },
   { file: 'clouds_far', z: 1, x: 0, y: 200, anchor: [0, 0], parallax: 0.1, drift: 0.15 },
-  { file: 'sun', z: 2, x: 380, y: 560, anchor: [0.5, 0.5], parallax: 0.1, anim: { type: 'pulse', speed: 0.025 } },
+  { file: 'sun', z: 2, x: 380, y: 560, anchor: [0.5, 0.5], parallax: 0, anim: { type: 'pulse', speed: 0.025 } },
   { file: 'clouds_near', z: 3, x: 0, y: 110, anchor: [0, 0], parallax: 0.2, drift: 0.35 },
   { file: 'mountains', z: 4, x: 960, y: 620, anchor: [0.5, 1], parallax: 0.3 },
-  { file: 'town', z: 5, x: 1440, y: 622, anchor: [0.5, 1], parallax: 0.4 },
+  { file: 'town', z: 5, x: 1440, y: 622, anchor: [0.5, 1], parallax: 0 },
   { file: 'sea', z: 6, x: 960, y: 620, anchor: [0.5, 0], parallax: 0.5 },
-  { file: 'sea_glitter', z: 6.5, x: 380, y: 620, anchor: [0.5, 0], parallax: 0.5, anim: { type: 'frames', count: 4, every: 9 } },
+  { file: 'sea_glitter', z: 6.5, x: 380, y: 620, anchor: [0.5, 0], parallax: 0, anim: { type: 'frames', count: 4, every: 9 } },
   // The frame layers are exactly canvas-wide (no slack to pan), so they stay locked.
   { file: 'balustrade', z: 7, x: 0, y: 650, anchor: [0, 0], parallax: 0 },
   { file: 'floor', z: 8, x: 0, y: 830, anchor: [0, 0], parallax: 0 },
@@ -99,7 +100,6 @@ function drawLayer(ctx: CanvasRenderingContext2D, l: Layer, f: number, pan: numb
   else if (a?.type === 'pulse') {
     const t = 0.5 + 0.5 * Math.sin(f * a.speed);
     ctx.globalAlpha = 0.9 + 0.1 * t;
-    ctx.scale(1 + 0.03 * t, 1 + 0.03 * t);
   } else if (a?.type === 'frames') sx = (Math.floor(f / a.every) % a.count) * fw;
   ctx.drawImage(img, sx, 0, fw, h, -l.anchor[0] * fw, -l.anchor[1] * h, fw, h);
   ctx.restore();

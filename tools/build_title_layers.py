@@ -61,6 +61,19 @@ def seamless(im: Image.Image, w: int, overlap: int) -> Image.Image:
     return Image.fromarray(a[:, :w].round().astype(np.uint8))
 
 
+def remove_reflection(im: Image.Image, x0: int, x1: int, src: int, feather: int = 60) -> Image.Image:
+    """Cover columns x0..x1 with clean water copied from `src`, so the sun's reflection can be its own
+    (locked) layer while the sea pans."""
+    a = np.array(im).astype(np.float32)
+    patch = a[:, src:src + (x1 - x0)]
+    w = np.ones(x1 - x0)
+    ramp = np.linspace(0, 1, feather)
+    w[:feather], w[-feather:] = ramp, ramp[::-1]
+    w = w[None, :, None]
+    a[:, x0:x1] = a[:, x0:x1] * (1 - w) + patch * w
+    return Image.fromarray(a.round().astype(np.uint8))
+
+
 def main(src_dir: str):
     os.makedirs(OUT, exist_ok=True)
     L = {k: load(src_dir, n) for k, n in SOURCES.items()}
@@ -73,7 +86,7 @@ def main(src_dir: str):
         'mountains': fit_w(content(L['mountains'], x=False), 2400),
         # At canvas scale the town would tower over the scene; keep it at the reference image's size.
         'town': fit_h(content(L['town']), 240),
-        'sea': fit_w(content(L['sea'], x=False), 2400),
+        'sea': remove_reflection(fit_w(content(L['sea'], x=False), 2400), 380, 1320, 1400),
         'balustrade': fit_w(content(L['balustrade']), 1920),
         'floor': L['floor'].resize((1920, 270), Image.LANCZOS),
         # Same 1672x941 framing as the reference title image, so they scale straight to 1920x1080.

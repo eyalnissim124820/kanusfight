@@ -104,10 +104,20 @@ export class TitleScene implements Scene {
 
 const arrow = (d: MotionDir) => ({ F: '→', B: '←', U: '↑', D: '↓', DF: '↘', DB: '↙', UF: '↗', UB: '↖', N: '·' })[d];
 
+/** Fighters whose move lists share one page of the Controls screen. */
+const MOVES_PER_PAGE = 2;
+
 export class ControlsScene implements Scene {
+  private page = 0;
+  private readonly pages = Math.ceil(ROSTER.length / MOVES_PER_PAGE);
   constructor(private app: App, private pair?: [number, number]) {}
   update() {
-    if (this.app.input.back() || this.app.input.confirm()) {
+    const { input, audio } = this.app;
+    if (this.pages > 1 && (input.menuLeft() || input.menuRight())) {
+      this.page = (this.page + (input.menuLeft() ? this.pages - 1 : 1)) % this.pages;
+      audio.play('select');
+    }
+    if (input.back() || input.confirm()) {
       this.app.audio.play('select');
       this.app.setScene(new TitleScene(this.app, { settings: true, pair: this.pair }));
     }
@@ -134,14 +144,15 @@ export class ControlsScene implements Scene {
     });
     text(ctx, 'Close LP throw · close HP elbow · close HK knee · ←+LK sweep · ←+HK roundhouse · ↓+HP uppercut',
       VIEW_W / 2, 262, 17, '#dddddd');
-    ROSTER.forEach((c, i) => {
+    ROSTER.slice(this.page * MOVES_PER_PAGE, (this.page + 1) * MOVES_PER_PAGE).forEach((c, i) => {
       const x = 40 + i * 460;
       text(ctx, `${c.name} — ${c.title}`, x, 305, 24, '#f2d06b', 'left');
       const lines = c.specials.map((s) => `${s.name}: ${s.air ? '(air) ' : ''}${s.motion.map(arrow).join(' ')} + ${s.button}`);
       lines.push(`FINISHER ${c.finisher.name}: ${c.finisher.motion.map(arrow).join(' ')} + ${c.finisher.button} (${c.finisher.range})`);
       lines.forEach((l, j) => text(ctx, l, x, 340 + j * 28, 18, j === lines.length - 1 ? '#ff8a7a' : '#ffffff', 'left'));
     });
-    text(ctx, 'Arrows are relative to facing (→ = toward the opponent). Esc / Enter to return.', VIEW_W / 2, 515, 16, '#999999');
+    if (this.pages > 1) text(ctx, `◀  FIGHTERS ${this.page + 1} / ${this.pages}  ▶`, VIEW_W / 2, 488, 20, '#f2d06b');
+    text(ctx, 'Arrows are relative to facing (→ = toward the opponent). ◀ ▶ more fighters · Esc / Enter to return.', VIEW_W / 2, 515, 16, '#999999');
   }
 }
 

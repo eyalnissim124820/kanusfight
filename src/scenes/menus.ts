@@ -1,5 +1,5 @@
 import type { App, Mode, Scene } from './scene';
-import { VIEW_W, VIEW_H } from '../game/match';
+import { VIEW_W, VIEW_H, STAGE_W } from '../game/match';
 import { ROSTER } from '../characters';
 import { STAGES, drawStage, getStage, GROUND_Y } from '../render/stage';
 import { drawCharacter } from '../render/fighterView';
@@ -158,11 +158,14 @@ export class SelectScene implements Scene {
   private cur: number[];
   private locked = [false, false];
   private t = 0;
-  private stageIdx = Math.floor(Math.random() * STAGES.length);
 
-  /** `start` is the pair of roster indices the two cursors begin on (random when not given). */
-  constructor(private app: App, private mode: Mode, start: [number, number] = randomPair()) {
+  /**
+   * `start` is the pair of roster indices the two cursors begin on (random when not given).
+   * `locked` re-opens the screen with both picks made (coming back from Choose Location).
+   */
+  constructor(private app: App, private mode: Mode, start: [number, number] = randomPair(), locked = false) {
     this.cur = [...start];
+    if (locked) this.locked = [true, true];
   }
 
   /** Who controls each cursor: in 1P / CPU modes player 1 picks both sides in order. */
@@ -175,6 +178,15 @@ export class SelectScene implements Scene {
     const { input, audio } = this.app;
     this.t++;
     const n = ROSTER.length;
+    // Both fighters picked: the NEXT button moves on to Choose Location, back un-picks the second.
+    if (this.locked[0] && this.locked[1]) {
+      if (input.back()) { this.locked[1] = false; audio.play('select'); }
+      else if (input.confirm()) {
+        audio.play('confirm');
+        this.app.setScene(new LocationScene(this.app, this.mode, [this.cur[0], this.cur[1]]));
+      }
+      return;
+    }
     const handle = (side: 0 | 1, layouts: ('p1' | 'p2')[], pad: number | null) => {
       if (this.locked[side]) return;
       if (input.menuLeft(layouts, pad)) { this.cur[side] = (this.cur[side] + n - 1) % n; audio.play('select'); }
@@ -185,15 +197,10 @@ export class SelectScene implements Scene {
     if (a === null) { handle(0, ['p1'], 0); handle(1, ['p2'], 1); }
     else handle(a, ['p1', 'p2'], null);
 
-    if (input.keyPressed('Tab')) { this.stageIdx = (this.stageIdx + 1) % STAGES.length; audio.play('select'); }
     if (input.back()) {
       if (this.locked[1]) this.locked[1] = false;
       else if (this.locked[0]) this.locked[0] = false;
       else this.app.setScene(new TitleScene(this.app));
-      return;
-    }
-    if (this.locked[0] && this.locked[1]) {
-      this.app.setScene(createFight(this.app, this.mode, ROSTER[this.cur[0]], ROSTER[this.cur[1]], STAGES[this.stageIdx].id));
     }
   }
 
@@ -234,7 +241,46 @@ export class SelectScene implements Scene {
     });
     const c = ROSTER[this.cur[this.activeSide() ?? 0]];
     wrap(ctx, c.bio, VIEW_W / 2, 330, 300, 18);
-    text(ctx, `STAGE: ${STAGES[this.stageIdx].name.toUpperCase()} (TAB)`, VIEW_W / 2, 470, 18, '#cccccc');
+    if (this.locked[0] && this.locked[1]) drawMenuButton(ctx, 'NEXT', VIEW_W / 2, 470, true);
+  }
+}
+
+// ---------------- Location select ----------------
+
+export class LocationScene implements Scene {
+  /** Starts on a random location; left/right browse, confirm fights there. */
+  private idx = Math.floor(Math.random() * STAGES.length);
+  private t = 0;
+
+  constructor(private app: App, private mode: Mode, private pair: [number, number]) {}
+
+  update() {
+    const { input, audio } = this.app;
+    this.t++;
+    const n = STAGES.length;
+    if (input.menuLeft()) { this.idx = (this.idx + n - 1) % n; this.t = 0; audio.play('select'); }
+    if (input.menuRight()) { this.idx = (this.idx + 1) % n; this.t = 0; audio.play('select'); }
+    if (input.back()) {
+      audio.play('select');
+      this.app.setScene(new SelectScene(this.app, this.mode, this.pair, true));
+    } else if (input.confirm()) {
+      audio.play('confirm');
+      const [a, b] = this.pair;
+      this.app.setScene(createFight(this.app, this.mode, ROSTER[a], ROSTER[b], STAGES[this.idx].id));
+    }
+  }
+
+  render(ctx: CanvasRenderingContext2D) {
+    // Full-screen preview of the location, slowly panning across it as the camera would in a fight.
+    const mid = (STAGE_W - VIEW_W) / 2;
+    drawStage(ctx, getStage(STAGES[this.idx].id), mid + Math.sin(this.t * 0.01) * mid * 0.9, this.app.frame);
+    const g = ctx.createLinearGradient(0, 0, 0, 130);
+    g.addColorStop(0, 'rgba(0,0,0,0.7)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, VIEW_W, 130);
+    text(ctx, 'CHOOSE LOCATION', VIEW_W / 2, 44, 52, '#f2d06b');
+    if (STAGES.length > 1) text(ctx, `${this.idx + 1} / ${STAGES.length}`, VIEW_W / 2, 88, 20, '#ffffff');
+    drawMenuButton(ctx, STAGES[this.idx].name, VIEW_W / 2, 470, true, STAGES.length > 1);
+    text(ctx, '◀ ▶ browse · Enter fight · Esc back', VIEW_W / 2, 518, 16, '#dddddd');
   }
 }
 

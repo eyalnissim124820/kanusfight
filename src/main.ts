@@ -58,11 +58,11 @@ function startGame() {
   };
   if (isTouchDevice()) app.touch = setupTouchControls(input);
 
-  // URL shortcuts for testing: ?mode=cpu&p1=kanu&p2=nyx&stage=moon&difficulty=hard
+  // URL shortcuts for testing: ?mode=cpu&p1=kanu&p2=nyx&stage=green&difficulty=hard
   if (q.get('difficulty')) app.difficulty = q.get('difficulty') as Difficulty;
   if (q.get('mode')) {
     scene = createFight(app, q.get('mode') as Mode, getCharacter(q.get('p1') ?? 'kanu'),
-      getCharacter(q.get('p2') ?? 'nyx'), q.get('stage') ?? 'ember');
+      getCharacter(q.get('p2') ?? 'nyx'), q.get('stage') ?? 'living');
   } else scene = new TitleScene(app);
   app.touch?.setInFight('match' in scene);
 

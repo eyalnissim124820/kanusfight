@@ -5,6 +5,7 @@ import { STAGES, drawStage, getStage, GROUND_Y } from '../render/stage';
 import { drawCharacter } from '../render/fighterView';
 import { text } from '../render/hud';
 import { drawTitleBackdrop, drawTitlePlaque } from '../render/titleBackdrop';
+import { drawMenuButton, drawMenuHeading } from '../render/menuUi';
 import { FightScene } from './fight';
 import type { CharacterDef, MotionDir } from '../game/types';
 import type { Fighter } from '../game/fighter';
@@ -36,16 +37,11 @@ function drawTitleScene(ctx: CanvasRenderingContext2D, app: App, pair: [number, 
   drawCharacter(ctx, ROSTER[pair[1]], 'idle', f, VIEW_W - 140, GROUND_Y, -1, 1);
 }
 
-/** Translucent panel with a centred list; `header` (if any) takes the first row. */
+/** Centred column of plaque buttons; `header` (if any) sits above them. */
 function drawMenu(ctx: CanvasRenderingContext2D, items: string[], sel: number, header?: string) {
-  const rows = items.length + (header ? 1 : 0);
-  ctx.fillStyle = 'rgba(20,8,30,0.55)';
-  ctx.beginPath();
-  ctx.roundRect(VIEW_W / 2 - 200, 222, 400, rows * 50 + 6, 14);
-  ctx.fill();
-  let y = 250;
-  if (header) { text(ctx, header, VIEW_W / 2, y, 26, '#f2d06b'); y += 50; }
-  items.forEach((s, i) => text(ctx, s, VIEW_W / 2, y + i * 50, 32, i === sel ? '#ff3b2f' : '#ffffff'));
+  let y = 262;
+  if (header) { drawMenuHeading(ctx, header, VIEW_W / 2, y - 8); y += 46; }
+  items.forEach((s, i) => drawMenuButton(ctx, s, VIEW_W / 2, y + i * 52, i === sel));
 }
 
 export class TitleScene implements Scene {
